@@ -1,4 +1,5 @@
 const ChromeExtensionReloader = require('webpack-chrome-extension-reloader');
+const { DefinePlugin } = require('webpack');
 const path = require("path");
 
 module.exports = {
@@ -34,5 +35,8 @@ module.exports = {
                 popup: 'popup'
             }
         }),
+        new DefinePlugin({
+            'global.process.env.LOG_LEVEL': '"debug"',
+        }), 
     ]
 };

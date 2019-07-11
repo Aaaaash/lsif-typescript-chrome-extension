@@ -6,18 +6,18 @@ export interface RawRepoSpec {
      *
      * Example: `github.com/sourcegraph/sourcegraph`
      */
-    rawRepoName: string
+    rawRepoName: string;
 }
 
 type GitHubURL =
     | ({ pageType: 'tree' | 'commit' | 'pull' | 'compare' | 'other' } & RawRepoSpec)
     | ({ pageType: 'blob'; revAndFilePath: string } & RawRepoSpec)
 
-export function parseURL(loc: Pick<Location, 'host' | 'pathname'> = window.location): GitHubURL {
+export function parseURL(loc: Pick<Location, 'host' | 'pathname'> = window.location): GitHubURL | undefined {
     const { host, pathname } = loc
     const [user, ghRepoName, pageType, ...rest] = pathname.slice(1).split('/')
     if (!user || !ghRepoName) {
-        throw new Error(`Could not parse repoName from GitHub url: ${window.location}`)
+        return undefined;
     }
     const rawRepoName = `${host}/${user}/${ghRepoName}`
     switch (pageType) {
