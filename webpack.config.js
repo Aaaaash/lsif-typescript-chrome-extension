@@ -5,6 +5,7 @@ module.exports = {
     entry: {
         background: path.join(__dirname, "src/background.ts"),
         content: path.join(__dirname, "src/content.ts"),
+        popup: path.join(__dirname, "src/popup.tsx"),
     },
     output: {
         path: path.join(__dirname, "out"),
@@ -29,7 +30,8 @@ module.exports = {
             reloadPage: true,
             entries: {
                 background: "background",
-                content: "content"
+                content: "content",
+                popup: 'popup'
             }
         }),
     ]

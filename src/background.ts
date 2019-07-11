@@ -1,7 +1,8 @@
-console.log('[LSIF-TS] Extension is running.');
+import { checkIsGitHubDotCom, parseURL } from './utils';
 
-const codeView = document.querySelector('table');
+if(checkIsGitHubDotCom()) {
+    console.log('[LSIF-TS] Extension is running.');
 
-if (codeView) {
-    console.log(codeView);
+    const githubUrl = parseURL(window.location);
+    console.log(githubUrl);
 }
