@@ -1,0 +1,23 @@
+{
+  "type": "object",
+  "properties": {
+    "enterpriseUrls": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "phabricatorMappings": {
+      "type": "array",
+      "id": "ListOfCallsignMappings",
+      "items": {
+        "type": "object",
+        "properties": {
+          "callsign": { "type": "string" },
+          "path": { "type": "string" },
+          "children": { "$ref": "ListOfCallsignMappings" }
+        }
+      }
+    }
+  }
+}
