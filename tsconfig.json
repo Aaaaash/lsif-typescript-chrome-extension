@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2016",
     "module": "commonjs",
     "moduleResolution": "node",
     "rootDir": "./src",
@@ -8,7 +8,8 @@
     "sourceMap": true,
     "jsx": "react",
     "lib": [
-      "es2015",
+      "es7",
+      "es2016.array.include",
       "dom"
     ],
     "experimentalDecorators": true,

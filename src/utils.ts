@@ -1,3 +1,5 @@
+import { githubCodeViewSelector } from "./constants";
+
 export const checkIsGitHubDotCom = (): boolean => /^https?:\/\/(www.)?github.com/.test(window.location.href)
 
 export interface RawRepoSpec {
@@ -39,3 +41,8 @@ export function parseURL(loc: Pick<Location, 'host' | 'pathname'> = window.locat
             return { pageType: 'other', rawRepoName }
     }
 }
+
+export const checkIsCodeView = (tableElement: HTMLTableElement): boolean => {
+    const classNames = tableElement.getAttribute('class').split(' ');
+    return classNames.length > 0 ? classNames.includes(githubCodeViewSelector) : false;
+};

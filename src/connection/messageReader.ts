@@ -1,4 +1,4 @@
-import { logger } from './logger';
+import { logger } from '../logger';
 
 export class MessageReader {
     constructor(private socket: WebSocket) {}

@@ -1,6 +1,6 @@
 import { MessageReader } from './messageReader';
 import { MessageWriter } from './messageWriter';
-import { logger, field } from './logger';
+import { logger, field } from '../logger';
 
 export class Connection {
     constructor(
