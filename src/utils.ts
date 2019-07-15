@@ -1,4 +1,5 @@
-import { githubCodeViewSelector } from "./constants";
+import { githubCodeViewSelector, githubCodeCellSelector } from './constants';
+import { Position } from './types';
 
 export const checkIsGitHubDotCom = (): boolean => /^https?:\/\/(www.)?github.com/.test(window.location.href)
 
@@ -46,3 +47,27 @@ export const checkIsCodeView = (tableElement: HTMLTableElement): boolean => {
     const classNames = tableElement.getAttribute('class').split(' ');
     return classNames.length > 0 ? classNames.includes(githubCodeViewSelector) : false;
 };
+
+export const findCodeCellFromContainer = (tableElement: HTMLTableElement): HTMLElement[] => {
+    return Array.from(tableElement.querySelectorAll('td.blob-code'));
+}
+
+export const checkTargetIsCodeCellChildren = (target: HTMLElement, codeCells: HTMLElement[]): boolean => {
+    if (
+        (target.parentElement &&
+        (codeCells.includes(target.parentElement) ||
+        target.parentElement.classList.contains(githubCodeCellSelector))) ||
+        (target.parentElement.parentElement &&
+        codeCells.includes(target.parentElement.parentElement) ||
+        target.parentElement.parentElement.classList.contains(githubCodeCellSelector))
+    ) {
+        return true;
+    }
+
+    return false;
+}
+
+export const convertPositionFromCodeCell = (target: HTMLElement): Position => {
+    // @TODO
+    return { line: 1, character: 0 };
+}

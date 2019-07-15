@@ -19,7 +19,7 @@ class App extends React.Component {
         super(props);
 
         chrome.runtime.onConnect.addListener((port: chrome.runtime.Port) => {
-            if(port.name === LSIFTypeScriptExtensionsChannel) {
+            if (port.name === LSIFTypeScriptExtensionsChannel) {
                 port.onMessage.addListener((message) => {
                     logger.info(message);
                     if (message.event) {

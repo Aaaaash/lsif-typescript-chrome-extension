@@ -1,8 +1,11 @@
-import { checkIsGitHubDotCom, parseURL, checkIsCodeView } from './utils';
+import { debounce } from 'lodash';
+
+import { checkIsGitHubDotCom, parseURL, checkIsCodeView, findCodeCellFromContainer } from './utils';
 import { logger, field } from './logger';
 import { MessageReader, MessageWriter, Connection } from './connection';
-import { LSIFServerConnectStatus } from './types';
+import { LSIFServerConnectStatus, Disposeable } from './types';
 import { LSIFTypeScriptExtensionsChannel, wsAddress } from './constants';
+import { hover } from './codeviewActions';
 
 const port = chrome.runtime.connect({ name: LSIFTypeScriptExtensionsChannel });
 
@@ -22,6 +25,7 @@ if(checkIsGitHubDotCom()) {
 
         connection.listen();
 
+        const disposes: Disposeable[] = [];
         websocket.onopen = () => {
             logger.debug('Connection success.');
 
@@ -47,17 +51,26 @@ if(checkIsGitHubDotCom()) {
         }
 
         websocket.onclose = () => {
-            logger.info("Lost connection...");
+            logger.info('Lost connection...');
 
             port.postMessage({ event: LSIFServerConnectStatus.disconnect });
+
+            for (const disposeable of disposes) {
+                disposeable.dispose();
+            }
         }
 
-        const tableElement = document.querySelector('table');
-
-        const isCodeView = checkIsCodeView(tableElement);
+        const codeView = document.querySelector('table');
+        const isCodeView = checkIsCodeView(codeView);
 
         if (isCodeView) {
-
+            const debouncedHover = debounce(hover, 250);
+            codeView.addEventListener('mousemove', debouncedHover);
+            disposes.push({
+                dispose: () => {
+                    codeView.removeEventListener('mousemove', debouncedHover);
+                },
+            });
         } else {
             logger.info('No GitHub Code View found.');
         }
