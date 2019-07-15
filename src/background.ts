@@ -6,7 +6,7 @@ import { MessageReader, MessageWriter, Connection } from './connection';
 import { ServerConnectStatus, Disposeable } from './types';
 import { TypeScriptExtensionsChannel, wsAddress } from './constants';
 import { hover } from './codeviewActions';
-import { InitializeArguments, InitializeResponse } from './protocol';
+import { InitializeArguments, InitializeResponse, DocumentSymbolArguments, InitializeFaliedResponse } from './protocol';
 
 const messageChannelPort = chrome.runtime.connect({ name: TypeScriptExtensionsChannel });
 
@@ -47,9 +47,24 @@ if(checkIsGitHubDotCom()) {
                 commit: githubUrl.pageType === 'blob' && githubUrl.revAndFilePath.split('/').shift()
             }
 
-            connection.sendRequest<InitializeArguments, InitializeResponse>('initialize', initArguments)
+            connection.sendRequest<InitializeArguments, InitializeResponse | InitializeFaliedResponse>('initialize', initArguments)
                 .then((result) => {
-                    logger.info(`Initialize: ${result ? 'success' : 'failed'}`);
+                    logger.info(`Initialize: ${result.initialized ? 'success' : 'failed'} ${result.initialized === false && result.message}`);
+
+                    if(result.initialized && githubUrl.pageType === 'blob') {
+                        const documentSymbolArgument = {
+                            textDocument: {
+                                uri: githubUrl.revAndFilePath.split('/').pop(),
+                            },
+                        };
+
+                        connection.sendRequest<DocumentSymbolArguments, {}>('documentSymbol', documentSymbolArgument)
+                            .then((res) => {
+                                console.log(res);
+                            });
+                    } else {
+                        // Nothing...
+                    }
                 });
 
             // Find all code cells from vode view.

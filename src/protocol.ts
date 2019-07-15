@@ -28,7 +28,14 @@ export interface InitializeArguments {
     commit?: string;
 };
 
-export type InitializeResponse = boolean;
+export interface InitializeResponse {
+    initialized: true;
+};
+
+export interface InitializeFaliedResponse {
+    initialized: false;
+    message: string;
+};
 
 interface TextDocumentInentifier {
     uri: string;
