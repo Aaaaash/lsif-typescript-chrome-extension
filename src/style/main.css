@@ -9,3 +9,13 @@
     max-height: 50%;
     overflow-y: scroll;
 }
+
+.lsif-typescript-extensions-hover-detail-container {
+    position: fixed;
+    border-radius: 2px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    padding: 4px;
+    color: cadetblue;
+    font-size: 12px;
+}

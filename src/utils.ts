@@ -52,7 +52,7 @@ export const findCodeCellFromContainer = (tableElement: HTMLTableElement): HTMLE
     return Array.from(tableElement.querySelectorAll('td.blob-code'));
 }
 
-export const checkTargetIsCodeCellChildren = (target: HTMLElement, codeCells: HTMLElement[]): boolean => {
+export const checkTargetIsCodeCellOrChildnodes = (target: HTMLElement, codeCells: HTMLElement[]): boolean => {
     if (
         (target.parentElement &&
         (codeCells.includes(target.parentElement) ||
@@ -83,7 +83,6 @@ export const convertPositionFromCodeCell = (target: HTMLElement): Position | nul
                 if (node.nodeType === 1) {
                     const rghTabsChildNodes = Array.from(node.childNodes);
                     rghTabsChildNodes.forEach((childNode) => {
-                        console.log(childNode.nodeValue);
                         if (childNode.nodeValue) {
                             character += childNode.nodeValue.length;
                         }
@@ -94,7 +93,7 @@ export const convertPositionFromCodeCell = (target: HTMLElement): Position | nul
                     continue;
                 }
             }
-            return { line, character };
+            return { line: line - 1, character: character - 1 };
         }
         return null;
     }

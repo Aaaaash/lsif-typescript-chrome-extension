@@ -4,7 +4,7 @@ export enum ServerConnectStatus {
     disconnect = 'DISCONNECT',
 }
 
-export interface Disposeable {
+export interface Disposable {
     dispose: () => void;
 }
 
