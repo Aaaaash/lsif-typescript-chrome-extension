@@ -1,4 +1,4 @@
-import { findCodeCellFromContainer, checkTargetIsCodeCellChildren } from './utils';
+import { findCodeCellFromContainer, checkTargetIsCodeCellChildren, convertPositionFromCodeCell } from './utils';
 
 export function hover(ev: MouseEvent): void {
     const codeView = document.querySelector('table');
@@ -6,11 +6,11 @@ export function hover(ev: MouseEvent): void {
 
     if (ev.target instanceof HTMLElement) {
         if (checkTargetIsCodeCellChildren(ev.target, codeCells)) {
-            console.log('bingo.');
+            const position = convertPositionFromCodeCell(ev.target);
+            if (position) {
+                // @TODO
+            }
         }
     }
 }
 
-export function documentSymbols() {
-
-}

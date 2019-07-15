@@ -67,7 +67,36 @@ export const checkTargetIsCodeCellChildren = (target: HTMLElement, codeCells: HT
     return false;
 }
 
-export const convertPositionFromCodeCell = (target: HTMLElement): Position => {
-    // @TODO
-    return { line: 1, character: 0 };
+export const convertPositionFromCodeCell = (target: HTMLElement): Position | null => {
+    const parentElement = target.parentElement;
+    if (parentElement) {
+        const parentId = parentElement.getAttribute('id');
+        if (parentId && parentId.startsWith('LC')) {
+            const line = Number(parentId.split('LC').pop());
+
+            const childNodes = Array.from(parentElement.childNodes);
+            let character = 0;
+            for (const node of childNodes) {
+                if (node === target) {
+                    break;
+                }
+                if (node.nodeType === 1) {
+                    const rghTabsChildNodes = Array.from(node.childNodes);
+                    rghTabsChildNodes.forEach((childNode) => {
+                        console.log(childNode.nodeValue);
+                        if (childNode.nodeValue) {
+                            character += childNode.nodeValue.length;
+                        }
+                    });
+                } else if (node.nodeType === 3) {
+                    character += node.nodeValue.length;
+                } else {
+                    continue;
+                }
+            }
+            return { line, character };
+        }
+        return null;
+    }
+    return null;
 }

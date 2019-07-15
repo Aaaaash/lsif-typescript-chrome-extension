@@ -66,7 +66,7 @@ if(checkIsGitHubDotCom()) {
                                 const textDocumentSymbolContainer = document.createElement('ul');
                                 textDocumentSymbolContainer.innerHTML = response.map((symbolItem) => `
                                     <li>
-                                    <a href="${window.location.href}#L${symbolItem.range.start.line + 1}">${symbolItem.name}</a>
+                                        <a href="${window.location.href}#L${symbolItem.range.start.line + 1}">${symbolItem.name}</a>
                                     </li>
                                 `).join('');
                                 textDocumentSymbolContainer.className = 'lsif-typescript-extensions-textdocument-symbols-container';
