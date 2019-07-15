@@ -30,6 +30,7 @@ export class Connection {
         if (resOrNotice.result) {
             const { id, result } = resOrNotice;
             const callback = this.requestCallbacks.get(id);
+            logger.debug('Receive response', field('values', { method: resOrNotice.method, id, result }));
             callback(result);
         }
     }

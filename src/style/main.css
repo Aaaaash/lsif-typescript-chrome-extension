@@ -1,0 +1,11 @@
+.lsif-typescript-extensions-textdocument-symbols-container {
+    position: fixed;
+    right: 10px;
+    top: 250px;
+    border: 1px solid #333;
+    border-radius: 4px;
+    box-shadow: 2px 2px 2px 1px #999;
+    background-color: #fff;
+    max-height: 50%;
+    overflow-y: scroll;
+}

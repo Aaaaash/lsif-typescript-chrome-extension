@@ -6,7 +6,9 @@ import { MessageReader, MessageWriter, Connection } from './connection';
 import { ServerConnectStatus, Disposeable } from './types';
 import { TypeScriptExtensionsChannel, wsAddress } from './constants';
 import { hover } from './codeviewActions';
-import { InitializeArguments, InitializeResponse, DocumentSymbolArguments, InitializeFaliedResponse } from './protocol';
+import { InitializeArguments, InitializeResponse, DocumentSymbolArguments, InitializeFaliedResponse, DocumentSymbolResponse } from './protocol';
+
+import './style/main.css';
 
 const messageChannelPort = chrome.runtime.connect({ name: TypeScriptExtensionsChannel });
 
@@ -54,13 +56,21 @@ if(checkIsGitHubDotCom()) {
                     if(result.initialized && githubUrl.pageType === 'blob') {
                         const documentSymbolArgument = {
                             textDocument: {
-                                uri: githubUrl.revAndFilePath.split('/').pop(),
+                                uri: githubUrl.revAndFilePath.split('/').slice(1).join('/'),
                             },
                         };
 
-                        connection.sendRequest<DocumentSymbolArguments, {}>('documentSymbol', documentSymbolArgument)
+                        connection.sendRequest<DocumentSymbolArguments, string>('documentSymbol', documentSymbolArgument)
                             .then((res) => {
-                                console.log(res);
+                                const response: DocumentSymbolResponse[] = JSON.parse(res);
+                                const textDocumentSymbolContainer = document.createElement('ul');
+                                textDocumentSymbolContainer.innerHTML = response.map((symbolItem) => `
+                                    <li>
+                                    <a href="${window.location.href}#L${symbolItem.range.start.line + 1}">${symbolItem.name}</a>
+                                    </li>
+                                `).join('');
+                                textDocumentSymbolContainer.className = 'lsif-typescript-extensions-textdocument-symbols-container';
+                                document.body.appendChild(textDocumentSymbolContainer);
                             });
                     } else {
                         // Nothing...
