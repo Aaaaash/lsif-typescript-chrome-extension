@@ -2115,6 +2115,13 @@ lru-cache@^5.1.1:
   dependencies:
     yallist "^3.0.2"
 
+lsif-protocol@^0.4.3:
+  version "0.4.3"
+  resolved "https://registry.npm.taobao.org/lsif-protocol/download/lsif-protocol-0.4.3.tgz#e528acc5d056b86b071dc242047a27182f7ddddf"
+  integrity sha1-5SisxdBWuGsHHcJCBHonGC993d8=
+  dependencies:
+    vscode-languageserver-protocol "^3.14.1"
+
 make-dir@^2.0.0:
   version "2.1.0"
   resolved "https://registry.npm.taobao.org/make-dir/download/make-dir-2.1.0.tgz#5f0310e18b8be898cc07009295a30ae41e91e6f5"
@@ -3641,6 +3648,24 @@ vm-browserify@^1.0.1:
   version "1.1.0"
   resolved "https://registry.npm.taobao.org/vm-browserify/download/vm-browserify-1.1.0.tgz#bd76d6a23323e2ca8ffa12028dc04559c75f9019"
   integrity sha1-vXbWojMj4sqP+hICjcBFWcdfkBk=
+
+vscode-jsonrpc@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.npm.taobao.org/vscode-jsonrpc/download/vscode-jsonrpc-4.0.0.tgz#a7bf74ef3254d0a0c272fab15c82128e378b3be9"
+  integrity sha1-p7907zJU0KDCcvqxXIISjjeLO+k=
+
+vscode-languageserver-protocol@^3.14.1:
+  version "3.14.1"
+  resolved "https://registry.npm.taobao.org/vscode-languageserver-protocol/download/vscode-languageserver-protocol-3.14.1.tgz#b8aab6afae2849c84a8983d39a1cf742417afe2f"
+  integrity sha1-uKq2r64oSchKiYPTmhz3QkF6/i8=
+  dependencies:
+    vscode-jsonrpc "^4.0.0"
+    vscode-languageserver-types "3.14.0"
+
+vscode-languageserver-types@3.14.0:
+  version "3.14.0"
+  resolved "https://registry.npm.taobao.org/vscode-languageserver-types/download/vscode-languageserver-types-3.14.0.tgz#d3b5952246d30e5241592b6dde8280e03942e743"
+  integrity sha1-07WVIkbTDlJBWStt3oKA4DlC50M=
 
 watchpack@^1.5.0:
   version "1.6.0"

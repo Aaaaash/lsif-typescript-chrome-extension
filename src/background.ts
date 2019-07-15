@@ -6,6 +6,7 @@ import { MessageReader, MessageWriter, Connection } from './connection';
 import { ServerConnectStatus, Disposeable } from './types';
 import { TypeScriptExtensionsChannel, wsAddress } from './constants';
 import { hover } from './codeviewActions';
+import { InitializeArguments, InitializeResponse } from './protocol';
 
 const messageChannelPort = chrome.runtime.connect({ name: TypeScriptExtensionsChannel });
 
@@ -40,18 +41,16 @@ if(checkIsGitHubDotCom()) {
     
             logger.info('Prepare initialize LSIF server.', field('url', gitCloneUrl));
 
-            const initializeRequest = JSON.stringify({
-                type: 'request',
-                method: 'initialize',
-                id: 0,
-                arguments: {
-                    projectName: githubUrl.rawRepoName,
-                    url: gitCloneUrl,
-                    commit: githubUrl.pageType === 'blob' && githubUrl.revAndFilePath.split('/').shift()
-                }
-            });
+            const initArguments = {
+                projectName: githubUrl.rawRepoName,
+                url: gitCloneUrl,
+                commit: githubUrl.pageType === 'blob' && githubUrl.revAndFilePath.split('/').shift()
+            }
 
-            connection.sendRequest(initializeRequest);
+            connection.sendRequest<InitializeArguments, InitializeResponse>('initialize', initArguments)
+                .then((result) => {
+                    logger.info(`Initialize: ${result ? 'success' : 'failed'}`);
+                });
 
             // Find all code cells from vode view.
             const codeView = document.querySelector('table');

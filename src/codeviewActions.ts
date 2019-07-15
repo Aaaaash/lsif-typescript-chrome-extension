@@ -10,3 +10,7 @@ export function hover(ev: MouseEvent): void {
         }
     }
 }
+
+export function documentSymbols() {
+
+}

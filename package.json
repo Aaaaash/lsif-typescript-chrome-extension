@@ -29,6 +29,7 @@
     "@types/react-dom": "^16.8.4",
     "@types/styled-components": "^4.1.18",
     "lodash": "^4.17.14",
+    "lsif-protocol": "^0.4.3",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "styled-components": "^4.3.2"

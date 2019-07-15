@@ -7,7 +7,6 @@ export class MessageReader {
         logger.info('Start listen message event from websocket.');
         this.socket.addEventListener('message', (event: MessageEvent) => {
             messageCallback(event.data);
-            console.log(event.data);
         });
     }
 }
