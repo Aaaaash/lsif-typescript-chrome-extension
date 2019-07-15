@@ -45,14 +45,6 @@ export interface DocumentSymbolArguments {
     textDocument: TextDocumentInentifier;
 }
 
-export interface DocumentSymbolResponse {
-    name: string;
-    detail: string;
-    kind: number;
-    range: lsp.Range;
-    selectionRange: lsp.Range;
-}
-
 export interface TextDocumentPositionArguments {
     textDocument: TextDocumentInentifier;
     position: lsp.Position;

@@ -6,9 +6,10 @@ import { MessageReader, MessageWriter, Connection } from './connection';
 import { ServerConnectStatus, Disposeable } from './types';
 import { TypeScriptExtensionsChannel, wsAddress } from './constants';
 import { hover } from './codeviewActions';
-import { InitializeArguments, InitializeResponse, DocumentSymbolArguments, InitializeFaliedResponse, DocumentSymbolResponse } from './protocol';
+import { InitializeArguments, InitializeResponse, DocumentSymbolArguments, InitializeFaliedResponse } from './protocol';
 
 import './style/main.css';
+import { lsp } from 'lsif-protocol';
 
 const messageChannelPort = chrome.runtime.connect({ name: TypeScriptExtensionsChannel });
 
@@ -60,9 +61,8 @@ if(checkIsGitHubDotCom()) {
                             },
                         };
 
-                        connection.sendRequest<DocumentSymbolArguments, string>('documentSymbol', documentSymbolArgument)
-                            .then((res) => {
-                                const response: DocumentSymbolResponse[] = JSON.parse(res);
+                        connection.sendRequest<DocumentSymbolArguments, lsp.DocumentSymbol[] | undefined>('documentSymbol', documentSymbolArgument)
+                            .then((response) => {
                                 const textDocumentSymbolContainer = document.createElement('ul');
                                 textDocumentSymbolContainer.innerHTML = response.map((symbolItem) => `
                                     <li>
