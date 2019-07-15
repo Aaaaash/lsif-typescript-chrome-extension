@@ -1,4 +1,4 @@
-export enum LSIFServerConnectStatus {
+export enum ServerConnectStatus {
     connecting = 'CONNECTING',
     connected = 'CONNECTED',
     disconnect = 'DISCONNECT',

@@ -14,7 +14,7 @@ export class Connection {
         this.messageReader.listen(this.messageCallback);
     }
 
-    private messageCallback(message: string) {
+    private messageCallback(message: string): void {
         logger.info('Message', field('message', message));
     }
 

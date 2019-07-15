@@ -1,6 +1,6 @@
 import { findCodeCellFromContainer, checkTargetIsCodeCellChildren } from './utils';
 
-export function hover(ev: MouseEvent) {
+export function hover(ev: MouseEvent): void {
     const codeView = document.querySelector('table');
     const codeCells = findCodeCellFromContainer(codeView);
 

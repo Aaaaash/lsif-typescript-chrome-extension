@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { render } from 'react-dom';
 import styled from 'styled-components';
-import { LSIFTypeScriptExtensionsChannel, wsAddress } from './constants';
+import { TypeScriptExtensionsChannel, wsAddress } from './constants';
 import { logger } from './logger';
 
 const Container = styled.div`
@@ -19,7 +19,8 @@ class App extends React.Component {
         super(props);
 
         chrome.runtime.onConnect.addListener((port: chrome.runtime.Port) => {
-            if (port.name === LSIFTypeScriptExtensionsChannel) {
+            console.assert(port.name === TypeScriptExtensionsChannel);
+            if (port.name === TypeScriptExtensionsChannel) {
                 port.onMessage.addListener((message) => {
                     logger.info(message);
                     if (message.event) {
@@ -33,7 +34,8 @@ class App extends React.Component {
     render() {
         return (
             <Container>
-                {this.state.connectStatus}
+                {this.state.connectStatus || 'unknow'}
+                <br />
                 {wsAddress}
             </Container>
         );
