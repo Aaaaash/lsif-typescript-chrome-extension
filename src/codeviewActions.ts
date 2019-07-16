@@ -153,7 +153,7 @@ export class CodeViewActions {
                             }
                         } else {
                             // @ts-ignore
-                            hoverActionElement.innerText = response.contents.value;
+                            hoverActionElement.innerHTML = marked(mdString);
                         }
 
                         targetNode.classList.add('lsif-ts-ext-highlight-target');
@@ -167,6 +167,7 @@ export class CodeViewActions {
 
                         const dispose = (): void => {
                             targetNode.removeEventListener('mouseleave', clearActionNode);
+                            targetNode.classList.remove('lsif-ts-ext-highlight-target');
                         };
                         this.disposes.push({ dispose });
                     }
