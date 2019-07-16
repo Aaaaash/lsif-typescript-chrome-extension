@@ -161,13 +161,13 @@ export class CodeViewActions {
                         const clearActionNode = (): void => {
                             targetNode.removeChild(hoverActionElement);
                             targetNode.classList.remove('lsif-ts-ext-highlight-target');
+                            targetNode.removeEventListener('mouseleave', clearActionNode);
                         };
+                        targetNode.addEventListener('mouseleave', clearActionNode);
 
                         const dispose = (): void => {
                             targetNode.removeEventListener('mouseleave', clearActionNode);
                         };
-
-                        targetNode.addEventListener('mouseleave', clearActionNode);
                         this.disposes.push({ dispose });
                     }
                 }
