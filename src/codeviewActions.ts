@@ -117,21 +117,29 @@ export class CodeViewActions {
                         const targetNodePosition = targetNode.getBoundingClientRect();
                         const hoverActionElement = document.createElement('div');
                         hoverActionElement.className = 'lsif-typescript-extensions-hover-detail-container';
-                        hoverActionElement.style.left = `${targetNodePosition.left}px`;
-                        hoverActionElement.style.top = `${targetNodePosition.top - 28}px`;
+                        hoverActionElement.style.left = `${targetNode.offsetLeft}px`;
+                        hoverActionElement.style.bottom = `${targetNodePosition.height}px`;
 
                         if(Array.isArray(response.contents)) {
                             // @ts-ignore
-                            hoverActionElement.innerText = response.contents[0].value;
+                            hoverActionElement.innerHTML = `<span class="lsif-typescript-extensions-hover-detail-description">${response.contents[0].value}</span>`;
+
+                            if (response.contents[1]) {
+                                hoverActionElement.innerHTML += `
+                                    <span>${response.contents[1]}</span>
+                                `
+                            }
                         } else {
                             // @ts-ignore
                             hoverActionElement.innerText = response.contents.value;
                         }
-                        document.body.appendChild(hoverActionElement);
+
+                        targetNode.appendChild(hoverActionElement);
+                        // document.body.appendChild(hoverActionElement);
 
                         this.disposes.push({
                             dispose: () => {
-                                document.removeChild(hoverActionElement);
+                                document.body.removeChild(hoverActionElement);
                             },
                         });
                     }

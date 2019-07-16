@@ -7,15 +7,29 @@
     border-radius: 4px;
     background-color: #fff;
     max-height: 50%;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .lsif-typescript-extensions-hover-detail-container {
-    position: fixed;
+    position: absolute;
     border-radius: 2px;
     border: 1px solid #ccc;
     background-color: #fff;
     padding: 4px;
-    color: cadetblue;
     font-size: 12px;
+    width: 350px;
+    line-height: 0.5;
+}
+
+.lsif-typescript-extensions-hover-detail-container .lsif-typescript-extensions-hover-detail-description {
+    color: cadetblue;
+}
+
+.lsif-typescript-extensions-hover-detail-container span {
+    display: block;
+    color: #666;
+    margin: 4px 0px 0px 0px;
+    padding: 0px;
+    white-space: pre-wrap;
+    line-height: 1;
 }

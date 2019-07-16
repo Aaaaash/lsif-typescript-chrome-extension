@@ -93,7 +93,7 @@ export const convertPositionFromCodeCell = (target: HTMLElement): Position | nul
                     continue;
                 }
             }
-            return { line: line - 1, character: character - 1 };
+            return { line: line - 1, character };
         }
         return null;
     }
