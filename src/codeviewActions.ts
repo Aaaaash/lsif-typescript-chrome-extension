@@ -1,11 +1,18 @@
 import { debounce } from 'lodash';
+import * as marked from 'marked';
+import * as hljs from 'highlight.js';
+import { lsp } from 'lsif-protocol';
+import 'highlight.js/styles/github.css';
 
 import { findCodeCellFromContainer, checkTargetIsCodeCellOrChildnodes, convertPositionFromCodeCell, parseURL, checkIsCodeView } from './utils';
 import { logger, field } from './logger';
 import { Connection } from './connection';
 import { InitializeArguments, InitializeResponse, InitializeFaliedResponse, DocumentSymbolArguments } from './protocol';
-import { lsp } from 'lsif-protocol';
 import { Disposable } from './types';
+
+marked.setOptions({
+    highlight: (code: string, lang: string) => hljs.highlight(lang, code).value,
+});
 
 type GitHubUrlType = ReturnType<typeof parseURL>;
 
@@ -101,7 +108,7 @@ export class CodeViewActions {
                     <a href="https://${domain}/${owner}/${project}/blob/${this.commit}/${this.relativePath}#L${symbolItem.range.start.line + 1}">${symbolItem.name}</a>
                 </li>
             `).join('');
-            textDocumentSymbolContainer.className = 'lsif-typescript-extensions-textdocument-symbols-container';
+            textDocumentSymbolContainer.className = 'lsif-ts-ext-textdocument-symbols-container';
             document.body.appendChild(textDocumentSymbolContainer);
 
             this.disposes.push({
@@ -131,18 +138,18 @@ export class CodeViewActions {
 
                         const targetNodePosition = targetNode.getBoundingClientRect();
                         const hoverActionElement = document.createElement('div');
-                        hoverActionElement.className = 'lsif-typescript-extensions-hover-detail-container';
+                        hoverActionElement.className = 'lsif-ts-ext-hover-detail-container';
                         hoverActionElement.style.left = `${targetNode.offsetLeft}px`;
-                        hoverActionElement.style.bottom = `${targetNodePosition.height}px`;
+                        hoverActionElement.style.bottom = `${targetNodePosition.height + 4}px`;
 
                         if(Array.isArray(response.contents)) {
                             // @ts-ignore
-                            hoverActionElement.innerHTML = `<span class="lsif-typescript-extensions-hover-detail-description">${response.contents[0].value}</span>`;
+                            const mdString = `${'```ts'}\n${response.contents[0].value}\n${'```'}`
+                            hoverActionElement.innerHTML = marked(mdString);
 
                             if (response.contents[1]) {
-                                hoverActionElement.innerHTML += `
-                                    <span>${response.contents[1]}</span>
-                                `
+                                // @ts-ignore
+                                hoverActionElement.innerHTML += `<div class="lsif-ts-ext-hover-detail-mdstring">${marked(response.contents[1])}</div>`;
                             }
                         } else {
                             // @ts-ignore
@@ -153,6 +160,7 @@ export class CodeViewActions {
 
                         const dispose = (): void => {
                             targetNode.removeChild(hoverActionElement);
+                            targetNode.removeEventListener('mouseleave', dispose);
                         }
                         targetNode.addEventListener('mouseleave', dispose);
                         this.disposes.push({ dispose });
