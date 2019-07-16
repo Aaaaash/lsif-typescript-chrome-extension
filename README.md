@@ -7,5 +7,5 @@
 ![](snapshot/navigate-to-symbol.png)
 
 - Hover (show symbol type and description)
-![](snapshot/hover.png)
+![](snapshot/hover.gif)
 

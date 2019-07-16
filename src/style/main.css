@@ -8,6 +8,8 @@
     background-color: #fff;
     max-height: 50%;
     overflow-y: auto;
+    font-size: 12px;
+    font-family: "SFMono-Regular,Consolas,Liberation Mono,Menlo,Courier,monospace";
 }
 
 .lsif-typescript-extensions-hover-detail-container {
@@ -19,10 +21,13 @@
     font-size: 12px;
     width: 350px;
     line-height: 0.5;
+    font-family: "SFMono-Regular,Consolas,Liberation Mono,Menlo,Courier,monospace";
 }
 
 .lsif-typescript-extensions-hover-detail-container .lsif-typescript-extensions-hover-detail-description {
     color: cadetblue;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 10px;
 }
 
 .lsif-typescript-extensions-hover-detail-container span {

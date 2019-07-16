@@ -9,6 +9,12 @@ import { Disposable } from './types';
 
 type GitHubUrlType = ReturnType<typeof parseURL>;
 
+interface BlobDetail {
+    domain: string;
+    owner: string;
+    project: string;
+}
+
 export class CodeViewActions {
 
     private disposes: Disposable[] = [];
@@ -19,11 +25,19 @@ export class CodeViewActions {
 
     private commit: string | undefined;
 
+    private blobDetail: BlobDetail | undefined;
+
     constructor(private connection: Connection) {}
 
     public start(githubUrl: GitHubUrlType): void {
         const [ domain, owner, project ] = githubUrl.rawRepoName.split('/');
         const cloneUrl = `git@${domain}:${owner}/${project}`;
+
+        this.blobDetail = {
+            domain,
+            owner,
+            project,
+        };
 
         logger.info('Prepare initialize LSIF server.', field('url', cloneUrl));
 
@@ -81,9 +95,10 @@ export class CodeViewActions {
     
             const documentSymbol = await this.connection.sendRequest<DocumentSymbolArguments, lsp.DocumentSymbol[] | undefined>('documentSymbol', documentSymbolArgument)
             const textDocumentSymbolContainer = document.createElement('ul');
+            const { domain, owner, project } = this.blobDetail;
             textDocumentSymbolContainer.innerHTML = documentSymbol.map((symbolItem) => `
                 <li>
-                    <a href="${window.location.href}#L${symbolItem.range.start.line + 1}">${symbolItem.name}</a>
+                    <a href="https://${domain}/${owner}/${project}/blob/${this.commit}/${this.relativePath}#L${symbolItem.range.start.line + 1}">${symbolItem.name}</a>
                 </li>
             `).join('');
             textDocumentSymbolContainer.className = 'lsif-typescript-extensions-textdocument-symbols-container';
@@ -135,13 +150,12 @@ export class CodeViewActions {
                         }
 
                         targetNode.appendChild(hoverActionElement);
-                        // document.body.appendChild(hoverActionElement);
 
-                        this.disposes.push({
-                            dispose: () => {
-                                document.body.removeChild(hoverActionElement);
-                            },
-                        });
+                        const dispose = (): void => {
+                            targetNode.removeChild(hoverActionElement);
+                        }
+                        targetNode.addEventListener('mouseleave', dispose);
+                        this.disposes.push({ dispose });
                     }
                 }
             }
