@@ -73,7 +73,7 @@ export class CodeViewActions {
         logger.info(`Initialize: ${initResult.initialized ? 'success' : 'failed'} ${initResult.initialized === false && initResult.message}`);
 
         if(initResult.initialized) {
-            await this.documentSymbols(githubUrl);
+            this.documentSymbols(githubUrl);
 
             // Find all code cells from vode view.
             const codeView = document.querySelector('table');
@@ -156,13 +156,18 @@ export class CodeViewActions {
                             hoverActionElement.innerText = response.contents.value;
                         }
 
-                        targetNode.appendChild(hoverActionElement);
+                        targetNode.classList.add('lsif-ts-ext-highlight-target');
+                        targetNode.appendChild(hoverActionElement);                        
+                        const clearActionNode = (): void => {
+                            targetNode.removeChild(hoverActionElement);
+                            targetNode.classList.remove('lsif-ts-ext-highlight-target');
+                        };
 
                         const dispose = (): void => {
-                            targetNode.removeChild(hoverActionElement);
-                            targetNode.removeEventListener('mouseleave', dispose);
-                        }
-                        targetNode.addEventListener('mouseleave', dispose);
+                            targetNode.removeEventListener('mouseleave', clearActionNode);
+                        };
+
+                        targetNode.addEventListener('mouseleave', clearActionNode);
                         this.disposes.push({ dispose });
                     }
                 }

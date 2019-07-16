@@ -24,7 +24,6 @@ export class Connection {
     }
 
     private messageCallback = (message: string): void => {
-        logger.info('Receive Message', field('message', message));
         const resOrNotice = JSON.parse(message);
 
         if (resOrNotice.result) {

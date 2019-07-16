@@ -17,7 +17,7 @@
     border-radius: 2px;
     border: 1px solid #ccc;
     background-color: #fff;
-    padding: 4px;
+    padding: 10px;
     font-size: 12px;
     line-height: 1;
     overflow: auto;
@@ -33,21 +33,14 @@
     white-space: pre-line;
 }
 
+.lsif-ts-ext-highlight-target {
+    background-color: wheat;
+}
+
 .lsif-ts-ext-hover-detail-mdstring {
     line-height: 1;
     margin-top: 5px;
     white-space: pre-wrap;
-    max-width: 350px;
-    overflow-x: auto;
-}
-
-.lsif-ts-ext-hover-detail-container span {
-    display: block;
-    color: #666;
-    margin: 4px 0px 0px 0px;
-    padding: 0px;
-    white-space: pre-wrap;
-    line-height: 1;
-    max-width: 350px;
+    max-width: 500px;
     overflow-x: auto;
 }
