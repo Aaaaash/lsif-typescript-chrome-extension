@@ -7,7 +7,7 @@ import { InitializeArguments, InitializeResponse, InitializeFaliedResponse, Docu
 import { lsp } from 'lsif-protocol';
 import { Disposable } from './types';
 
-type GithubUrlType = ReturnType<typeof parseURL>;
+type GitHubUrlType = ReturnType<typeof parseURL>;
 
 export class CodeViewActions {
 
@@ -21,50 +21,57 @@ export class CodeViewActions {
 
     constructor(private connection: Connection) {}
 
-    public initialize(githubUrl: GithubUrlType): void {
+    public start(githubUrl: GitHubUrlType): void {
         const [ domain, owner, project ] = githubUrl.rawRepoName.split('/');
-        const gitCloneUrl = `git@${domain}:${owner}/${project}`;
+        const cloneUrl = `git@${domain}:${owner}/${project}`;
 
-        logger.info('Prepare initialize LSIF server.', field('url', gitCloneUrl));
+        logger.info('Prepare initialize LSIF server.', field('url', cloneUrl));
 
         if (githubUrl.pageType === 'blob') {
             this.relativePath = githubUrl.revAndFilePath.split('/').slice(1).join('/')
             this.commit = githubUrl.revAndFilePath.split('/').shift();
         }
 
+        this.initialize(githubUrl, cloneUrl);
+    }
+
+    public dispose(): void {
+        for(const disposable of this.disposes) {
+            disposable.dispose();
+        }
+    }
+
+    private async initialize(githubUrl: GitHubUrlType, cloneUrl: string): Promise<void> {
         const initArguments = {
             projectName: githubUrl.rawRepoName,
-            url: gitCloneUrl,
+            url: cloneUrl,
             commit: this.commit && this.commit,
         }
 
-        this.connection.sendRequest<InitializeArguments, InitializeResponse | InitializeFaliedResponse>('initialize', initArguments)
-            .then((result) => {
-                logger.info(`Initialize: ${result.initialized ? 'success' : 'failed'} ${result.initialized === false && result.message}`);
+        const initResult = await this.connection.sendRequest<InitializeArguments, InitializeResponse | InitializeFaliedResponse>('initialize', initArguments);
+        logger.info(`Initialize: ${initResult.initialized ? 'success' : 'failed'} ${initResult.initialized === false && initResult.message}`);
 
-                if(result.initialized) {
-                    this.documentSymbols(githubUrl);
+        if(initResult.initialized) {
+            await this.documentSymbols(githubUrl);
 
-                    // Find all code cells from vode view.
-                    const codeView = document.querySelector('table');
-                    const isCodeView = checkIsCodeView(codeView);
+            // Find all code cells from vode view.
+            const codeView = document.querySelector('table');
+            const isCodeView = checkIsCodeView(codeView);
 
-                    if (isCodeView) {
-                        this.codeView = codeView;
-
-                        const debouncedHoverAction = debounce(this.hoverAction, 250);
-                        this.codeView.addEventListener('mousemove', debouncedHoverAction);
-                        this.disposes.push({
-                            dispose: () => {
-                                this.codeView.removeEventListener('mousemove', debouncedHoverAction);
-                            },
-                        });
-                    }
-                }
-            });
+            if (isCodeView) {
+                this.codeView = codeView;
+                const debouncedHoverAction = debounce(this.hoverAction, 250);
+                this.codeView.addEventListener('mousemove', debouncedHoverAction);
+                this.disposes.push({
+                    dispose: () => {
+                        this.codeView.removeEventListener('mousemove', debouncedHoverAction);
+                    },
+                });
+            }
+        }
     }
 
-    private documentSymbols(githubUrl: GithubUrlType): void {
+    private async documentSymbols(githubUrl: GitHubUrlType): Promise<void> {
         if (githubUrl.pageType === 'blob') {
             const documentSymbolArgument = {
                 textDocument: {
@@ -72,17 +79,21 @@ export class CodeViewActions {
                 },
             };
     
-            this.connection.sendRequest<DocumentSymbolArguments, lsp.DocumentSymbol[] | undefined>('documentSymbol', documentSymbolArgument)
-                .then((response) => {
-                    const textDocumentSymbolContainer = document.createElement('ul');
-                    textDocumentSymbolContainer.innerHTML = response.map((symbolItem) => `
-                        <li>
-                            <a href="${window.location.href}#L${symbolItem.range.start.line + 1}">${symbolItem.name}</a>
-                        </li>
-                    `).join('');
-                    textDocumentSymbolContainer.className = 'lsif-typescript-extensions-textdocument-symbols-container';
-                    document.body.appendChild(textDocumentSymbolContainer);
-                });
+            const documentSymbol = await this.connection.sendRequest<DocumentSymbolArguments, lsp.DocumentSymbol[] | undefined>('documentSymbol', documentSymbolArgument)
+            const textDocumentSymbolContainer = document.createElement('ul');
+            textDocumentSymbolContainer.innerHTML = documentSymbol.map((symbolItem) => `
+                <li>
+                    <a href="${window.location.href}#L${symbolItem.range.start.line + 1}">${symbolItem.name}</a>
+                </li>
+            `).join('');
+            textDocumentSymbolContainer.className = 'lsif-typescript-extensions-textdocument-symbols-container';
+            document.body.appendChild(textDocumentSymbolContainer);
+
+            this.disposes.push({
+                dispose: () => {
+                    document.body.removeChild(textDocumentSymbolContainer);
+                },
+            })
         }
     }
 
@@ -104,7 +115,6 @@ export class CodeViewActions {
                         const response = await this.connection.sendRequest<{}, lsp.Hover | undefined>('hover', hoverArgs);
 
                         const targetNodePosition = targetNode.getBoundingClientRect();
-                        console.log(targetNodePosition);
                         const hoverActionElement = document.createElement('div');
                         hoverActionElement.className = 'lsif-typescript-extensions-hover-detail-container';
                         hoverActionElement.style.left = `${targetNodePosition.left}px`;
@@ -118,6 +128,12 @@ export class CodeViewActions {
                             hoverActionElement.innerText = response.contents.value;
                         }
                         document.body.appendChild(hoverActionElement);
+
+                        this.disposes.push({
+                            dispose: () => {
+                                document.removeChild(hoverActionElement);
+                            },
+                        });
                     }
                 }
             }

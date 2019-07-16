@@ -27,18 +27,17 @@ if(checkIsGitHubDotCom()) {
         const connection = new Connection(messageReader, messageWriter);
 
         connection.listen();
-        
+        const codeviewActions = new CodeViewActions(connection);
+
         websocket.onopen = () => {
             logger.debug('Connection success.');
-            const actions = new CodeViewActions(connection);
-
-            actions.initialize(githubUrl);
+            codeviewActions.start(githubUrl);
             // messageChannelPort.postMessage({ event: ServerConnectStatus.connected });
         }
 
         websocket.onclose = () => {
             logger.info('Lost connection...');
-
+            codeviewActions.dispose();
             // messageChannelPort.postMessage({ event: ServerConnectStatus.disconnect });
             // messageChannelPort.disconnect();
         }
