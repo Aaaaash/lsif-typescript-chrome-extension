@@ -9,6 +9,8 @@ import { logger, field } from './logger';
 import { Connection } from './connection';
 import { InitializeArguments, InitializeResponse, InitializeFaliedResponse, DocumentSymbolArguments } from './protocol';
 import { Disposable } from './types';
+import { symbolKindNames } from './constants';
+import './style/symbol-icons.css';
 
 marked.setOptions({
     highlight: (code: string, lang: string) => hljs.highlight(lang, code).value,
@@ -105,6 +107,7 @@ export class CodeViewActions {
             const { domain, owner, project } = this.blobDetail;
             textDocumentSymbolContainer.innerHTML = documentSymbol.map((symbolItem) => `
                 <li>
+                    <span class="lsif-ts-ext-symbol-icon lsif-ts-ext-symbol-icon-${symbolKindNames[symbolItem.kind]}"></span>
                     <a href="https://${domain}/${owner}/${project}/blob/${this.commit}/${this.relativePath}#L${symbolItem.range.start.line + 1}">${symbolItem.name}</a>
                 </li>
             `).join('');

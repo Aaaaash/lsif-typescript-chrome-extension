@@ -31,6 +31,13 @@ module.exports = {
                         loader: 'css-loader' // Translates CSS into CommonJS
                     }
                 ]
+            },
+            {
+			    test: /\.svg/,
+			    use: {
+			        loader: 'svg-url-loader',
+			        options: {}
+			    }
             }
         ]
     },
@@ -49,6 +56,6 @@ module.exports = {
         }),
         new DefinePlugin({
             'global.process.env.LOG_LEVEL': '"debug"',
-        }),
+        })
     ]
 };

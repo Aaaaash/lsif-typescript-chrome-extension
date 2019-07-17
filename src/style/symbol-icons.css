@@ -1,0 +1,162 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.lsif-ts-ext-symbol-icon {
+	background-repeat: no-repeat;
+	display: inline-block;
+	height: 14px;
+	width: 16px;
+	min-height: 14px;
+	min-width: 16px;
+	background-position: center;
+	margin-right: 4px;
+}
+
+/* default icons */
+.monaco-workbench .symbol-icon {
+	background-image: url('../../assets/media/field-light.svg');
+	background-repeat: no-repeat;
+}
+
+/* constant */
+.lsif-ts-ext-symbol-icon-constant {
+	background-image: url('../../assets/media/constant-light.svg');
+}
+
+/* enum */
+.lsif-ts-ext-symbol-icon-enum {
+	background-image: url('../../assets/media/enumerator-light.svg');
+}
+
+/* enum-member */
+.lsif-ts-ext-symbol-icon-enum-member {
+	background-image: url('../../assets/media/enumerator-item-light.svg');
+}
+
+/* struct */
+.lsif-ts-ext-symbol-icon-struct {
+	background-image: url('../../assets/media/structure-light.svg');
+}
+
+/* event */
+.lsif-ts-ext-symbol-icon-event {
+	background-image: url('../../assets/media/event-light.svg');
+}
+
+/* operator */
+.lsif-ts-ext-symbol-icon-operator {
+	background-image: url('../../assets/media/operator-light.svg');
+}
+
+/* type paramter */
+.lsif-ts-ext-symbol-icon-type-parameter {
+	background-image: url('../../assets/media/template-light.svg');
+}
+
+/* boolean, null */
+.lsif-ts-ext-symbol-icon-boolean {
+	background-image: url('../../assets/media/boolean-light.svg');
+}
+
+/* null */
+.lsif-ts-ext-symbol-icon-null {
+	background-image: url('../../assets/media/boolean-light.svg');
+}
+
+/* class */
+.lsif-ts-ext-symbol-icon-class {
+	background-image: url('../../assets/media/class-light.svg');
+}
+
+/* constructor */
+.lsif-ts-ext-symbol-icon-constructor {
+	background-image: url('../../assets/media/method-light.svg');
+}
+
+/* file */
+.lsif-ts-ext-symbol-icon-file {
+	background-image: url('../../assets/media/file-light.svg');
+}
+
+/* field */
+.lsif-ts-ext-symbol-icon-field {
+	background-image: url('../../assets/media/field-light.svg');
+}
+
+/* variable */
+.lsif-ts-ext-symbol-icon-variable {
+	background-image: url('../../assets/media/variable-light.svg');
+}
+
+/* array */
+.lsif-ts-ext-symbol-icon-array {
+	background-image: url('../../assets/media/indexer-light.svg');
+}
+
+/* keyword */
+/* todo@joh not used? */
+.lsif-ts-ext-symbol-icon-keyword {
+	background-image: url('../../assets/media/keyword-light.svg');
+}
+
+/* interface */
+.lsif-ts-ext-symbol-icon-interface {
+	background-image: url('../../assets/media/interface-light.svg');
+}
+
+/* method */
+.lsif-ts-ext-symbol-icon-method {
+	background-image: url('../../assets/media/method-light.svg');
+}
+
+/* function */
+.lsif-ts-ext-symbol-icon-function {
+	background-image: url('../../assets/media/method-light.svg');
+}
+
+/* object */
+.lsif-ts-ext-symbol-icon-object {
+	background-image: url('../../assets/media/namespace-light.svg');
+}
+
+/* namespace */
+.lsif-ts-ext-symbol-icon-namespace {
+	background-image: url('../../assets/media/namespace-light.svg');
+}
+
+/* package */
+.lsif-ts-ext-symbol-icon-package {
+	background-image: url('../../assets/media/namespace-light.svg');
+}
+
+/* module */
+.lsif-ts-ext-symbol-icon-module {
+	background-image: url('../../assets/media/namespace-light.svg');
+}
+
+/* number */
+.lsif-ts-ext-symbol-icon-number {
+	background-image: url('../../assets/media/numeric-light.svg');
+}
+
+/* property */
+.lsif-ts-ext-symbol-icon-property {
+	background-image: url('../../assets/media/property-light.svg');
+}
+
+/* snippet */
+.lsif-ts-ext-symbol-icon-snippet {
+	background-image: url('../../assets/media/snippet-light.svg');
+}
+
+/* string */
+.lsif-ts-ext-symbol-icon-string {
+	background-image: url('../../assets/media/string-light.svg');
+}
+
+/* key */
+.lsif-ts-ext-symbol-icon-key {
+	background-image: url('../../assets/media/string-light.svg');
+}

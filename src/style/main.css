@@ -12,6 +12,12 @@
     font-family: "SFMono-Regular,Consolas,Liberation Mono,Menlo,Courier,monospace";
 }
 
+.lsif-ts-ext-textdocument-symbols-container li {
+    display: flex;
+    align-items: center;
+    height: 22px;
+}
+
 .lsif-ts-ext-hover-detail-container {
     position: absolute;
     border-radius: 2px;
