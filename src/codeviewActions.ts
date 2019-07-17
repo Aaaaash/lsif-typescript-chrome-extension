@@ -11,6 +11,7 @@ import { InitializeArguments, InitializeResponse, InitializeFaliedResponse, Docu
 import { Disposable } from './types';
 import { symbolKindNames } from './constants';
 import './style/symbol-icons.css';
+import { DocumentSymbol } from 'vscode-languageserver-types';
 
 marked.setOptions({
     highlight: (code: string, lang: string) => hljs.highlight(lang, code).value,
@@ -111,6 +112,27 @@ export class CodeViewActions {
         };
     }
 
+    private makeSymbolTree(symbolTree: DocumentSymbol[]): string {
+        const { domain, owner, project } = this.blobDetail;
+        return symbolTree.map((symbolItem) => `
+            <li title="${symbolItem.name}" data-symbol-link=true data-domain="${domain}" data-owner="${owner}" data-project="${project}" data-line="${symbolItem.range.start.line + 1}">
+                <span class="lsif-ts-ext-symbol-icon lsif-ts-ext-symbol-icon-${symbolKindNames[symbolItem.kind]}"></span>
+                <span class="lsif-ts-ext-symbol-link">${symbolItem.name}</span>
+            </li>
+            ${symbolItem.children ? `<ul class="lsif-ts-ext-symbol-children">${this.makeSymbolTreeChindren(symbolItem.children)}</ul>` : ''}
+        `).join('');
+    }
+
+    private makeSymbolTreeChindren(children: DocumentSymbol[]): string {
+        const { domain, owner, project } = this.blobDetail;
+        return children.map((symbolItem) => `
+            <li title="${symbolItem.name}" data-symbol-link=true data-domain="${domain}" data-owner="${owner}" data-project="${project}" data-line="${symbolItem.range.start.line + 1}">
+                <span class="lsif-ts-ext-symbol-icon lsif-ts-ext-symbol-icon-${symbolKindNames[symbolItem.kind]}"></span>
+                <span class="lsif-ts-ext-symbol-link">${symbolItem.name}</span>
+            </li>
+        `).join('');
+    }
+
     private async documentSymbols(githubUrl: GitHubUrlType): Promise<void> {
         if (githubUrl.pageType === 'blob') {
             const documentSymbolArgument = {
@@ -119,15 +141,9 @@ export class CodeViewActions {
                 },
             };
 
-            const documentSymbol = await this.connection.sendRequest<DocumentSymbolArguments, lsp.DocumentSymbol[] | undefined>('documentSymbol', documentSymbolArgument)
+            const documentSymbolTree = await this.connection.sendRequest<DocumentSymbolArguments, lsp.DocumentSymbol[] | undefined>('documentSymbol', documentSymbolArgument)
             const documentSymbolContainer = document.createElement('ul');
-            const { domain, owner, project } = this.blobDetail;
-            documentSymbolContainer.innerHTML = documentSymbol.map((symbolItem) => `
-                <li data-symbol-link=true data-domain="${domain}" data-owner="${owner}" data-project="${project}" data-line="${symbolItem.range.start.line + 1}">
-                    <span class="lsif-ts-ext-symbol-icon lsif-ts-ext-symbol-icon-${symbolKindNames[symbolItem.kind]}"></span>
-                    <span class="lsif-ts-ext-symbol-link" title="${symbolItem.name}">${symbolItem.name}</span>
-                </li>
-            `).join('');
+            documentSymbolContainer.innerHTML = this.makeSymbolTree(documentSymbolTree);
             documentSymbolContainer.className = 'lsif-ts-ext-textdocument-symbols-container';
             document.body.appendChild(documentSymbolContainer);
 

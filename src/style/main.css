@@ -1,8 +1,9 @@
 .lsif-ts-ext-textdocument-symbols-container {
     position: fixed;
     right: 0px;
-    top: 250px;
-    padding: 10px 0px;
+    top: 50%;
+    margin: -15% 0 0 0;
+    padding: 5px 0px;
     border: 1px solid #ccc;
     border-radius: 2px;
     background-color: #fff;
@@ -33,16 +34,21 @@
     display: flex;
     align-items: center;
     height: 22px;
-    padding: 0px 10px;
+    padding: 0px 5px;
     cursor: pointer;
 }
 
 .lsif-ts-ext-symbol-link {
-    max-width: 250px;
+    width: 200px;
+    max-width: 200px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     pointer-events: none;
+}
+
+.lsif-ts-ext-symbol-children li {
+    padding-left: 20px;
 }
 
 .lsif-ts-ext-textdocument-symbols-container li:hover {
