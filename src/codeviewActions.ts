@@ -4,7 +4,14 @@ import * as hljs from 'highlight.js';
 import { lsp } from 'lsif-protocol';
 import 'highlight.js/styles/github.css';
 
-import { findCodeCellFromContainer, checkTargetIsCodeCellOrChildnodes, convertPositionFromCodeCell, parseURL, checkIsCodeView } from './utils';
+import {
+    memoizedFindCodeCellFromContainer,
+    checkTargetIsCodeCellOrChildnodes,
+    convertPositionFromCodeCell,
+    parseURL,
+    checkIsCodeView,
+    fillTextNodeForCodeCell,
+} from './utils';
 import { logger, field } from './logger';
 import { Connection } from './connection';
 import { InitializeArguments, InitializeResponse, InitializeFaliedResponse, DocumentSymbolArguments } from './protocol';
@@ -83,6 +90,9 @@ export class CodeViewActions {
             const isCodeView = checkIsCodeView(codeView);
 
             if (isCodeView) {
+                logger.info('Fill code cells');
+                fillTextNodeForCodeCell(codeView);
+
                 this.codeView = codeView;
                 const debouncedHoverAction = debounce(this.hoverAction, 250);
                 this.codeView.addEventListener('mousemove', debouncedHoverAction);
@@ -119,17 +129,7 @@ export class CodeViewActions {
                 <span class="lsif-ts-ext-symbol-icon lsif-ts-ext-symbol-icon-${symbolKindNames[symbolItem.kind]}"></span>
                 <span class="lsif-ts-ext-symbol-link">${symbolItem.name}</span>
             </li>
-            ${symbolItem.children ? `<ul class="lsif-ts-ext-symbol-children">${this.makeSymbolTreeChindren(symbolItem.children)}</ul>` : ''}
-        `).join('');
-    }
-
-    private makeSymbolTreeChindren(children: DocumentSymbol[]): string {
-        const { domain, owner, project } = this.blobDetail;
-        return children.map((symbolItem) => `
-            <li title="${symbolItem.name}" data-symbol-link=true data-domain="${domain}" data-owner="${owner}" data-project="${project}" data-line="${symbolItem.range.start.line + 1}">
-                <span class="lsif-ts-ext-symbol-icon lsif-ts-ext-symbol-icon-${symbolKindNames[symbolItem.kind]}"></span>
-                <span class="lsif-ts-ext-symbol-link">${symbolItem.name}</span>
-            </li>
+            ${symbolItem.children ? `<ul class="lsif-ts-ext-symbol-children">${this.makeSymbolTree(symbolItem.children)}</ul>` : ''}
         `).join('');
     }
 
@@ -159,7 +159,7 @@ export class CodeViewActions {
     private hoverAction = async (ev: MouseEvent): Promise<void> => {
         if (this.codeView && this.relativePath) {
             const targetNode = ev.target;
-            const codeCells = findCodeCellFromContainer(this.codeView);
+            const codeCells = memoizedFindCodeCellFromContainer(this.codeView);
 
             if (targetNode instanceof HTMLElement) {
                 if (checkTargetIsCodeCellOrChildnodes(targetNode, codeCells)) {

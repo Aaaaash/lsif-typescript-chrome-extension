@@ -1,3 +1,5 @@
+import { memoize } from 'lodash';
+
 import { githubCodeViewSelector, githubCodeCellSelector } from './constants';
 import { Position } from './types';
 
@@ -17,19 +19,19 @@ type GitHubURL =
     | ({ pageType: 'blob'; revAndFilePath: string } & RawRepoSpec)
 
 export function parseURL(loc: Pick<Location, 'host' | 'pathname'> = window.location): GitHubURL | undefined {
-    const { host, pathname } = loc
-    const [user, ghRepoName, pageType, ...rest] = pathname.slice(1).split('/')
+    const { host, pathname } = loc;
+    const [user, ghRepoName, pageType, ...rest] = pathname.slice(1).split('/');
     if (!user || !ghRepoName) {
         return undefined;
     }
-    const rawRepoName = `${host}/${user}/${ghRepoName}`
+    const rawRepoName = `${host}/${user}/${ghRepoName}`;
     switch (pageType) {
         case 'blob':
             return {
                 pageType,
                 rawRepoName,
                 revAndFilePath: rest.join('/'),
-            }
+            };
         case 'tree':
         case 'pull':
         case 'commit':
@@ -37,9 +39,9 @@ export function parseURL(loc: Pick<Location, 'host' | 'pathname'> = window.locat
             return {
                 pageType,
                 rawRepoName,
-            }
+            };
         default:
-            return { pageType: 'other', rawRepoName }
+            return { pageType: 'other', rawRepoName };
     }
 }
 
@@ -48,11 +50,29 @@ export const checkIsCodeView = (tableElement: HTMLTableElement): boolean => {
     return classNames.length > 0 ? classNames.includes(githubCodeViewSelector) : false;
 };
 
-export const findCodeCellFromContainer = (tableElement: HTMLTableElement): HTMLElement[] => {
-    return Array.from(tableElement.querySelectorAll('td.blob-code'));
+const _findCodeCellFromContainer = (tableElement: HTMLTableElement): Element[] => {
+    return Array.from(tableElement.querySelectorAll('td.blob-code'))
+        .filter((codeCell) => codeCell.childNodes.length > 1);
 }
 
-export const checkTargetIsCodeCellOrChildnodes = (target: HTMLElement, codeCells: HTMLElement[]): boolean => {
+export const memoizedFindCodeCellFromContainer = memoize(_findCodeCellFromContainer);
+
+export const fillTextNodeForCodeCell = (tableElement: HTMLTableElement): void => {
+    const codeCells = memoizedFindCodeCellFromContainer(tableElement);
+
+    for (const codeCell of codeCells) {
+        codeCell.childNodes.forEach((childNode) => {
+            // TextNode
+            if (childNode.nodeType === 3) {
+                const textSpan = document.createElement('span');
+                textSpan.innerHTML = childNode.nodeValue;
+                codeCell.replaceChild(textSpan, childNode);
+            }
+        });
+    }
+}
+
+export const checkTargetIsCodeCellOrChildnodes = (target: HTMLElement, codeCells: Element[]): boolean => {
     if (
         (target.parentElement &&
         (codeCells.includes(target.parentElement) ||
