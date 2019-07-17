@@ -107,13 +107,33 @@ export class CodeViewActions {
 
     private addSymbolNavigateEventListener(parent: HTMLElement): Disposable {
         const eventHandler = (ev: Event): void => {
-            // @ts-ignore
+            if (!(ev.target instanceof HTMLElement)) {
+                return;
+            }
             if (ev.target !== parent && ev.target.dataset['symbolLink']) {
-                // @ts-ignore
                 const { domain, owner, project, line } = ev.target.dataset;
                 window.location.href = `https:\/\/${domain}\/${owner}\/${project}\/blob\/${this.commit}\/${this.relativePath}#L${line}`;
+            } else if (ev.target && ev.target.dataset['lineSymbol'] && ev.target.dataset['expanded']) {
+                const { lineSymbol, expanded } = ev.target.dataset;
+                const [ symbolName, line ] = lineSymbol.split(':');
+                const childrenContainer = document.querySelector(`#lsif-ts-ext-symbol-children-${symbolName}-${line}`);
+                console.log(JSON.parse(expanded), typeof expanded);
+                if (JSON.parse(expanded)) {
+                    // @ts-ignore
+                    childrenContainer.style.display = 'none';
+                    ev.target.setAttribute('data-expanded', 'false');
+                    ev.target.classList.add('lsif-ts-ext-symbol-arrow-collapsed');
+                    ev.target.classList.remove('lsif-ts-ext-symbol-arrow-expanded')
+                } else {
+                    // @ts-ignore
+                    childrenContainer.style.display = 'block';
+                    ev.target.setAttribute('data-expanded', 'true');
+                    ev.target.classList.add('lsif-ts-ext-symbol-arrow-expanded');
+                    ev.target.classList.remove('lsif-ts-ext-symbol-arrow-collapsed')
+                }
             }
         }
+
         parent.addEventListener('click', eventHandler);
         return {
             dispose: () => {
@@ -122,14 +142,34 @@ export class CodeViewActions {
         };
     }
 
-    private makeSymbolTree(symbolTree: DocumentSymbol[]): string {
+    private makeSymbolTree(symbolTree: DocumentSymbol[], deep: number): string {
         const { domain, owner, project } = this.blobDetail;
         return symbolTree.map((symbolItem) => `
-            <li title="${symbolItem.name}" data-symbol-link=true data-domain="${domain}" data-owner="${owner}" data-project="${project}" data-line="${symbolItem.range.start.line + 1}">
+            <li
+                title="${symbolItem.name}"
+                data-symbol-link=true data-domain="${domain}"
+                data-owner="${owner}"
+                data-project="${project}"
+                data-line="${symbolItem.range.start.line + 1}"
+                ${deep > 0 ? `style="padding-left: ${24 * deep}px"` : ''}
+            >
+                ${symbolItem.children ?
+        `<span
+            class="lsif-ts-ext-symbol-icon lsif-ts-ext-symbol-icon-arrow lsif-ts-ext-symbol-arrow-expanded"
+            data-line-symbol="${symbolItem.name}:${symbolItem.range.start.line + 1}"
+            data-expanded="true"
+        ></span>` :
+        '<span class="lsif-ts-ext-symbol-icon"></span>'}
                 <span class="lsif-ts-ext-symbol-icon lsif-ts-ext-symbol-icon-${symbolKindNames[symbolItem.kind]}"></span>
                 <span class="lsif-ts-ext-symbol-link">${symbolItem.name}</span>
             </li>
-            ${symbolItem.children ? `<ul class="lsif-ts-ext-symbol-children">${this.makeSymbolTree(symbolItem.children)}</ul>` : ''}
+            ${symbolItem.children ?
+        `<ul
+            class="lsif-ts-ext-symbol-children"
+            id="lsif-ts-ext-symbol-children-${symbolItem.name}-${symbolItem.range.start.line + 1}">
+            ${this.makeSymbolTree(symbolItem.children, deep + 1)}
+        </ul>` :
+        ''}
         `).join('');
     }
 
@@ -143,7 +183,7 @@ export class CodeViewActions {
 
             const documentSymbolTree = await this.connection.sendRequest<DocumentSymbolArguments, lsp.DocumentSymbol[] | undefined>('documentSymbol', documentSymbolArgument)
             const documentSymbolContainer = document.createElement('ul');
-            documentSymbolContainer.innerHTML = this.makeSymbolTree(documentSymbolTree);
+            documentSymbolContainer.innerHTML = this.makeSymbolTree(documentSymbolTree, 0);
             documentSymbolContainer.className = 'lsif-ts-ext-textdocument-symbols-container';
             document.body.appendChild(documentSymbolContainer);
 
@@ -152,7 +192,7 @@ export class CodeViewActions {
                 dispose: () => {
                     document.body.removeChild(documentSymbolContainer);
                 },
-            })
+            });
         }
     }
 

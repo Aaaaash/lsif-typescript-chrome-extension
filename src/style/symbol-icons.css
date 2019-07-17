@@ -15,6 +15,20 @@
 	pointer-events: none;
 }
 
+.lsif-ts-ext-symbol-icon-arrow {
+	pointer-events: inherit;
+}
+
+.lsif-ts-ext-symbol-arrow-expanded {
+	background-size: cover;
+	background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23646465' d='M11 10H5.344L11 4.414V10z'/%3E%3C/svg%3E");
+}
+
+.lsif-ts-ext-symbol-arrow-collapsed {
+	background-size: cover;
+	background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23646465' d='M6 4v8l4-4-4-4zm1 2.414L8.586 8 7 9.586V6.414z'/%3E%3C/svg%3E");
+}
+
 /* default icons */
 .monaco-workbench .symbol-icon {
 	background-image: url('../../assets/media/field-light.svg');
