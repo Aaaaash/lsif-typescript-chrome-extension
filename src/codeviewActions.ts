@@ -94,6 +94,23 @@ export class CodeViewActions {
         }
     }
 
+    private addSymbolNavigateEventListener(parent: HTMLElement): Disposable {
+        const eventHandler = (ev: Event): void => {
+            // @ts-ignore
+            if (ev.target !== parent && ev.target.dataset['symbolLink']) {
+                // @ts-ignore
+                const { domain, owner, project, line } = ev.target.dataset;
+                window.location.href = `https:\/\/${domain}\/${owner}\/${project}\/blob\/${this.commit}\/${this.relativePath}#L${line}`;
+            }
+        }
+        parent.addEventListener('click', eventHandler);
+        return {
+            dispose: () => {
+                parent.removeEventListener('click', eventHandler);
+            },
+        };
+    }
+
     private async documentSymbols(githubUrl: GitHubUrlType): Promise<void> {
         if (githubUrl.pageType === 'blob') {
             const documentSymbolArgument = {
@@ -101,22 +118,23 @@ export class CodeViewActions {
                     uri: this.relativePath
                 },
             };
-    
+
             const documentSymbol = await this.connection.sendRequest<DocumentSymbolArguments, lsp.DocumentSymbol[] | undefined>('documentSymbol', documentSymbolArgument)
-            const textDocumentSymbolContainer = document.createElement('ul');
+            const documentSymbolContainer = document.createElement('ul');
             const { domain, owner, project } = this.blobDetail;
-            textDocumentSymbolContainer.innerHTML = documentSymbol.map((symbolItem) => `
-                <li>
+            documentSymbolContainer.innerHTML = documentSymbol.map((symbolItem) => `
+                <li data-symbol-link=true data-domain="${domain}" data-owner="${owner}" data-project="${project}" data-line="${symbolItem.range.start.line + 1}">
                     <span class="lsif-ts-ext-symbol-icon lsif-ts-ext-symbol-icon-${symbolKindNames[symbolItem.kind]}"></span>
-                    <a href="https://${domain}/${owner}/${project}/blob/${this.commit}/${this.relativePath}#L${symbolItem.range.start.line + 1}">${symbolItem.name}</a>
+                    <span class="lsif-ts-ext-symbol-link" title="${symbolItem.name}">${symbolItem.name}</span>
                 </li>
             `).join('');
-            textDocumentSymbolContainer.className = 'lsif-ts-ext-textdocument-symbols-container';
-            document.body.appendChild(textDocumentSymbolContainer);
+            documentSymbolContainer.className = 'lsif-ts-ext-textdocument-symbols-container';
+            document.body.appendChild(documentSymbolContainer);
 
+            this.disposes.push(this.addSymbolNavigateEventListener(documentSymbolContainer));
             this.disposes.push({
                 dispose: () => {
-                    document.body.removeChild(textDocumentSymbolContainer);
+                    document.body.removeChild(documentSymbolContainer);
                 },
             })
         }
