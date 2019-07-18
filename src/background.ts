@@ -32,14 +32,14 @@ chrome.extension.onRequest.addListener((request, sender, sendResponse) => {
         case PostMessageEventType.reconnect: {
             logger.debug('Reconnecting');
             websocket.reconnect();
-            const repoter = (): void => {
+            const openCallback = (): void => {
                 logger.debug('Reconnect success, restartup app...');
-                websocket.removeEventListener('open', repoter);
+                websocket.removeEventListener('open', openCallback);
                 connectStatus = ServerConnectStatus.connected;
                 // startup(websocket, (window as ExtensionWindow).getConnectStatus);
                 sendResponse({ event: 'RECONNECT_SUCCESS' });
             };
-            websocket.addEventListener('open', repoter); 
+            websocket.addEventListener('open', openCallback); 
             break;
         }
         default:

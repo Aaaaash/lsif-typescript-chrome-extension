@@ -1,7 +1,7 @@
 import { PostMessageEventType, ServerConnectStatus, NormalEventType } from '../types';
-import { logger } from '../logger';
 
 export class ContentConnection {
+
     private req: number = 0;
 
     private responseCallBacks: Map<number, (response: any) => any> = new Map();
@@ -63,7 +63,7 @@ export class ContentConnection {
             });
         });
     }
-    
+
     public dispose(): void {
         this.messagePort.disconnect();
     }
