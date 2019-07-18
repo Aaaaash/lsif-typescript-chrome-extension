@@ -117,7 +117,7 @@ export class CodeViewActions {
                 const { lineSymbol, expanded } = ev.target.dataset;
                 const [ symbolName, line ] = lineSymbol.split(':');
                 const childrenContainer = document.querySelector(`#lsif-ts-ext-symbol-children-${symbolName}-${line}`);
-                console.log(JSON.parse(expanded), typeof expanded);
+
                 if (JSON.parse(expanded)) {
                     // @ts-ignore
                     childrenContainer.style.display = 'none';
@@ -155,9 +155,9 @@ export class CodeViewActions {
             >
                 ${symbolItem.children ?
         `<span
-            class="lsif-ts-ext-symbol-icon lsif-ts-ext-symbol-icon-arrow lsif-ts-ext-symbol-arrow-expanded"
+            class="lsif-ts-ext-symbol-icon lsif-ts-ext-symbol-icon-arrow lsif-ts-ext-symbol-arrow-collapsed"
             data-line-symbol="${symbolItem.name}:${symbolItem.range.start.line + 1}"
-            data-expanded="true"
+            data-expanded="false"
         ></span>` :
         '<span class="lsif-ts-ext-symbol-icon"></span>'}
                 <span class="lsif-ts-ext-symbol-icon lsif-ts-ext-symbol-icon-${symbolKindNames[symbolItem.kind]}"></span>
@@ -165,6 +165,7 @@ export class CodeViewActions {
             </li>
             ${symbolItem.children ?
         `<ul
+            style="display: none"
             class="lsif-ts-ext-symbol-children"
             id="lsif-ts-ext-symbol-children-${symbolItem.name}-${symbolItem.range.start.line + 1}">
             ${this.makeSymbolTree(symbolItem.children, deep + 1)}

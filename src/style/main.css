@@ -11,6 +11,8 @@
     overflow-y: auto;
     font-size: 12px;
     user-select: none;
+    max-width: 300px;
+    width: 300px;
     font-family: "SFMono-Regular,Consolas,Liberation Mono,Menlo,Courier,monospace";
 }
 

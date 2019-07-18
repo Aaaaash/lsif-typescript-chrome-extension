@@ -1,5 +1,5 @@
 ## LSIF TypeScript Chrome Extensions
-
+![](snapshot/all.gif)
 ### Features
 
 - Navigate to document symbols
