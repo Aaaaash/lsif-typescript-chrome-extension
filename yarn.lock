@@ -3006,6 +3006,11 @@ readdirp@^2.2.1:
     micromatch "^3.1.10"
     readable-stream "^2.0.2"
 
+reconnecting-websocket@^4.1.10:
+  version "4.1.10"
+  resolved "https://registry.npm.taobao.org/reconnecting-websocket/download/reconnecting-websocket-4.1.10.tgz#15485b5c5266ab6dd99187e23e8da207d24c4270"
+  integrity sha1-FUhbXFJmq23ZkYfiPo2iB9JMQnA=
+
 regex-not@^1.0.0, regex-not@^1.0.2:
   version "1.0.2"
   resolved "https://registry.npm.taobao.org/regex-not/download/regex-not-1.0.2.tgz#1f4ece27e00b0b65e0247a6810e6a85d83a5752c"

@@ -1,11 +1,12 @@
 import { PostMessageEventType, ServerConnectStatus, NormalEventType } from '../types';
+import { logger } from '../logger';
 
 export class ContentConnection {
     private req: number = 0;
 
-    private responseCallBack: Map<number, (response: any) => any> = new Map();
+    private responseCallBacks: Map<number, (response: any) => any> = new Map();
 
-    private normalEventCallback: Map<NormalEventType, (response: any) => any> = new Map(); 
+    private rpcEventCallbacks: Map<NormalEventType, (response: any) => any> = new Map(); 
 
     private disposeCallback: () => void;
 
@@ -13,16 +14,15 @@ export class ContentConnection {
         messagePort.onMessage.addListener((message) => {
             switch (message.event) {
                 case PostMessageEventType.response:
-                    const resHandler = this.responseCallBack.get(message.id);
+                    const resHandler = this.responseCallBacks.get(message.id);
                     resHandler(message.data.result);
                     break;
                 case PostMessageEventType.normalEvent:
-                    const eventHandler = this.normalEventCallback.get(message.data.eventType);
+                    const eventHandler = this.rpcEventCallbacks.get(message.data.eventType);
                     eventHandler(message.data.result);
                     break;
                 case PostMessageEventType.dispose:
                     this.disposeCallback();
-                    this.dispose();
                     break;
                 default:
                     break;
@@ -43,7 +43,7 @@ export class ContentConnection {
                 }
             });
 
-            this.responseCallBack.set(id, (response: R) => {
+            this.responseCallBacks.set(id, (response: R) => {
                 resolve(response);
             });
         });
@@ -58,7 +58,7 @@ export class ContentConnection {
                 },
             });
 
-            this.normalEventCallback.set(NormalEventType.checkConnect, (response) => {
+            this.rpcEventCallbacks.set(NormalEventType.checkConnect, (response) => {
                 resolve(response);
             });
         });
@@ -70,5 +70,9 @@ export class ContentConnection {
 
     public onDispose(callback): void {
         this.disposeCallback = callback;
+    }
+
+    // @TODO How restartup?
+    public onRestartup(callback): void {
     }
 }

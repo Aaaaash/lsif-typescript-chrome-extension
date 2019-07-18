@@ -15,9 +15,7 @@ export class Connection {
     constructor(
         private messageReader: MessageReader,
         private messageWriter: MessageWriter,
-    ) {
-        logger.info('Connect...');
-    }
+    ) {}
 
     public listen(): void {
         this.messageReader.listen(this.messageCallback);

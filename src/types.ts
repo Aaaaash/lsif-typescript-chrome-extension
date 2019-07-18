@@ -15,7 +15,7 @@ export interface Position {
 }
 
 export interface ExtensionWindow extends Window {
-    getConnectStatus(): string;
+    getConnectStatus(): ServerConnectStatus;
 }
 
 export enum NormalEventType {
@@ -27,4 +27,6 @@ export enum PostMessageEventType {
     response = 'RESPONSE',
     request = 'REQUEST',
     dispose = 'DISPOSE',
+    reconnect = 'RECONNECT',
+    restartup = 'RESTARTUP',
 };

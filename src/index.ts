@@ -7,6 +7,16 @@ import { ServerConnectStatus } from './types';
 
 import './style/main.css';
 
+const startup = (connection: ContentConnection, githubUrl): void => {
+    const codeviewActions = new CodeViewActions(connection);
+    codeviewActions.start(githubUrl);
+
+    connection.onDispose(() => {
+        codeviewActions.dispose();
+        logger.info('Websocket disconnect, cleanup all effects.');
+    });
+}
+
 if(checkIsGitHubDotCom()) {
     logger.info('LSIF Extension is running.');
     const githubUrl = parseURL(window.location);
@@ -22,17 +32,16 @@ if(checkIsGitHubDotCom()) {
         connection.checkConnect()
             .then((response) => {
                 logger.debug(`Check connect ${response}`);
-
                 if (response === ServerConnectStatus.connected) {
-                    const codeviewActions = new CodeViewActions(connection);
-                    codeviewActions.start(githubUrl);
-
-                    connection.onDispose(() => {
-                        codeviewActions.dispose();
-                        logger.info('Websocket disconnect, cleanup all effects.');
-                    });
+                    startup(connection, githubUrl);
                 }
             });
+
+        // connection.onRestartup(() => {
+        //     const messagePort = chrome.runtime.connect({ name: TypeScriptExtensionsChannel });
+        //     const newConnection = new ContentConnection(messagePort);
+        //     startup(newConnection, githubUrl);
+        // });
     } else {
         logger.info('No GitHub repository found.');
     }
