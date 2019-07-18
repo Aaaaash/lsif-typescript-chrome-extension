@@ -13,7 +13,7 @@ import {
     fillTextNodeForCodeCell,
 } from './utils';
 import { logger, field } from './logger';
-import { Connection } from './connection';
+import { ContentConnection } from './connection';
 import { InitializeArguments, InitializeResponse, InitializeFaliedResponse, DocumentSymbolArguments } from './protocol';
 import { Disposable } from './types';
 import { symbolKindNames } from './constants';
@@ -44,7 +44,7 @@ export class CodeViewActions {
 
     private blobDetail: BlobDetail | undefined;
 
-    constructor(private connection: Connection) {}
+    constructor(private connection: ContentConnection) {}
 
     public start(githubUrl: GitHubUrlType): void {
         const [ domain, owner, project ] = githubUrl.rawRepoName.split('/');

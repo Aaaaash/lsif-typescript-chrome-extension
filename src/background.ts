@@ -1,48 +1,75 @@
-import { checkIsGitHubDotCom, parseURL } from './utils';
 import { logger, field } from './logger';
+import { wsAddress, TypeScriptExtensionsChannel } from './constants';
+import { ServerConnectStatus, ExtensionWindow, PostMessageEventType, NormalEventType } from './types';
 import { MessageReader, MessageWriter, Connection } from './connection';
-import { TypeScriptExtensionsChannel, wsAddress } from './constants';
-import { CodeViewActions } from './codeviewActions';
 
-import './style/main.css';
+logger.info('LSIF TypeScript extension is running.');
 
-const messageChannelPort = chrome.runtime.connect({ name: TypeScriptExtensionsChannel });
+let connectStatus = ServerConnectStatus.disconnect;
+// For popup page
+(window as ExtensionWindow).getConnectStatus = () => connectStatus;
 
-messageChannelPort.onDisconnect.addListener((disconnectPort) => {
-    console.log(disconnectPort);
+const websocket = new WebSocket(wsAddress);
+websocket.addEventListener('open', (ev) => {
+    connectStatus = ServerConnectStatus.connected;
+
+    const websocket = new WebSocket(wsAddress);
+    const messageReader = new MessageReader(websocket);
+    const messageWriter = new MessageWriter(websocket);
+    const connection = new Connection(messageReader, messageWriter);
+    connection.listen();
+
+    chrome.runtime.onConnect.addListener((messagePort) => {
+        logger.info(messagePort.name);
+        console.assert(messagePort.name === TypeScriptExtensionsChannel);
+        const { sender: { tab, url, id } } = messagePort;
+        logger.debug('Sender', field('info', { url, id, tab: tab.id }));
+
+        messagePort.onMessage.addListener(async (message) => {
+            logger.debug(message);
+            switch(message.event) {
+                case PostMessageEventType.normalEvent:
+                    switch(message.data.eventType) {
+                        case NormalEventType.checkConnect:
+                            messagePort.postMessage({
+                                event: PostMessageEventType.normalEvent,
+                                data: {
+                                    eventType: NormalEventType.checkConnect,
+                                    result: connectStatus,
+                                },
+                            });
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case PostMessageEventType.request:
+                    const { data, id } = message;
+                    const response = await connection.sendRequest(data.method, data.arguments);
+                    messagePort.postMessage({
+                        event: PostMessageEventType.response,
+                        id,
+                        data: {
+                            result: response,
+                        },
+                    });
+                    break;
+                default:
+                    break;
+            };
+        });
+
+
+        websocket.addEventListener('close', () => {
+            messagePort.postMessage({
+                event: PostMessageEventType.dispose,
+            });
+        });
+    });
+
+    logger.info('Connect success.');
+}); 
+
+websocket.addEventListener('close', () => {
+    connectStatus = ServerConnectStatus.disconnect;
 });
-
-if(checkIsGitHubDotCom()) {
-    logger.info('LSIF Extension is running.');
-
-    const githubUrl = parseURL(window.location);
-
-    if (githubUrl) {
-        // messageChannelPort.postMessage({ event: ServerConnectStatus.connecting });
-        logger.info('GitHub Repo infomation', field('repo', githubUrl));
-
-        const websocket = new WebSocket(wsAddress);
-        const messageReader = new MessageReader(websocket);
-        const messageWriter = new MessageWriter(websocket);
-        const connection = new Connection(messageReader, messageWriter);
-
-        connection.listen();
-        const codeviewActions = new CodeViewActions(connection);
-
-        websocket.onopen = () => {
-            logger.debug('Connection success.');
-            codeviewActions.start(githubUrl);
-            // messageChannelPort.postMessage({ event: ServerConnectStatus.connected });
-        }
-
-        websocket.onclose = () => {
-            logger.info('Lost connection...');
-            codeviewActions.dispose();
-            // messageChannelPort.postMessage({ event: ServerConnectStatus.disconnect });
-            // messageChannelPort.disconnect();
-        }
-
-    } else {
-        logger.info('No GitHub repository found.');
-    }
-}

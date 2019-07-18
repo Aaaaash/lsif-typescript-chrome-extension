@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { render } from 'react-dom';
 import styled from 'styled-components';
+
+import { ExtensionWindow } from './types';
 import { TypeScriptExtensionsChannel, wsAddress } from './constants';
 import { logger } from './logger';
 
@@ -17,17 +19,9 @@ class App extends React.Component {
 
     constructor(props) {
         super(props);
-
-        chrome.runtime.onConnect.addListener((port: chrome.runtime.Port) => {
-            console.assert(port.name === TypeScriptExtensionsChannel);
-            if (port.name === TypeScriptExtensionsChannel) {
-                port.onMessage.addListener((message) => {
-                    logger.info(message);
-                    if (message.event) {
-                        this.setState({ connectStatus: message.event });
-                    }
-                });
-            }
+        logger.debug('Render');
+        chrome.runtime.getBackgroundPage((backgroundPage) => {
+            this.setState({ connectStatus: (backgroundPage as ExtensionWindow).getConnectStatus() });
         });
     }
 

@@ -17,10 +17,15 @@
     "48": "assets/icon-48.png",
     "128": "assets/icon-128.png"
   },
+  "background": {
+    "scripts": [
+      "out/background.js"
+    ]
+  },
   "content_scripts": [
     {
       "js": [
-        "out/background.js"
+        "out/index.js"
       ],
       "matches": [
         "http://*/*",
