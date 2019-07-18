@@ -2,17 +2,17 @@ import { checkIsGitHubDotCom, parseURL } from './utils';
 import { logger, field } from './logger';
 import { ContentConnection } from './connection';
 import { TypeScriptExtensionsChannel } from './constants';
-import { CodeViewActions } from './codeviewActions';
+import { GitHubCodeView } from './codeViews';
 import { ServerConnectStatus } from './types';
 
 import './style/main.css';
 
 const startup = (connection: ContentConnection, githubUrl): void => {
-    const codeviewActions = new CodeViewActions(connection);
-    codeviewActions.start(githubUrl);
+    const codeview = new GitHubCodeView(connection);
+    codeview.start(githubUrl);
 
     connection.onDispose(() => {
-        codeviewActions.dispose();
+        codeview.dispose();
         logger.info('Websocket disconnect, cleanup all effects.');
     });
 }

@@ -14,3 +14,4 @@
 - 优化 hover 的 tips 样式
 - 支持 gotoDefinition
 - 支持 findReferences
+- 支持 CODING interprise

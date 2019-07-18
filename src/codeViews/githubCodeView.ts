@@ -11,13 +11,13 @@ import {
     parseURL,
     checkIsCodeView,
     fillTextNodeForCodeCell,
-} from './utils';
-import { logger, field } from './logger';
-import { ContentConnection } from './connection';
-import { InitializeArguments, InitializeResponse, InitializeFaliedResponse, DocumentSymbolArguments } from './protocol';
-import { Disposable } from './types';
-import { symbolKindNames } from './constants';
-import './style/symbol-icons.css';
+} from '../utils';
+import { logger, field } from '../logger';
+import { ContentConnection } from '../connection';
+import { InitializeArguments, InitializeResponse, InitializeFaliedResponse, DocumentSymbolArguments } from '../protocol';
+import { Disposable } from '../types';
+import { symbolKindNames } from '../constants';
+import '../style/symbol-icons.css';
 import { DocumentSymbol } from 'vscode-languageserver-types';
 
 marked.setOptions({
@@ -32,7 +32,7 @@ interface BlobDetail {
     project: string;
 }
 
-export class CodeViewActions {
+export class GitHubCodeView {
 
     private disposes: Disposable[] = [];
 
@@ -254,4 +254,3 @@ export class CodeViewActions {
         }
     }
 }
-
