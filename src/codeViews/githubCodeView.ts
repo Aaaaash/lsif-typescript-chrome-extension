@@ -151,7 +151,7 @@ export class GitHubCodeView {
                 data-owner="${owner}"
                 data-project="${project}"
                 data-line="${symbolItem.range.start.line + 1}"
-                ${deep > 0 ? `style="padding-left: ${24 * deep}px"` : ''}
+                ${deep === 0 ? 'class="lsif-tsc-outer-li"' : ''}"
             >
                 ${symbolItem.children ?
         `<span
@@ -165,7 +165,7 @@ export class GitHubCodeView {
             </li>
             ${symbolItem.children ?
         `<ul
-            style="display: none"
+            style="padding-left: 24px; display: none"
             class="lsif-ts-ext-symbol-children"
             id="lsif-ts-ext-symbol-children-${symbolItem.name}-${symbolItem.range.start.line + 1}">
             ${this.makeSymbolTree(symbolItem.children, deep + 1)}

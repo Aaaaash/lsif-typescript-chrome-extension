@@ -50,14 +50,39 @@
 
 .lsif-ts-ext-symbol-children {
     width: 100%;
+    position: relative;
 }
 
-.lsif-ts-ext-symbol-children li {
-    padding-left: 24px;
+.lsif-ts-ext-symbol-children::before {
+    content: '';
+    width: 1px;
+    height: 100%;
+    position: absolute;
+    background-color: #ccc;
+    top: 0px;
+    left: 24px;
+    opacity: 0;
+    transition: opacity ease-in 0.1s;
+}
+
+.lsif-ts-ext-symbol-children:hover::before {
+    opacity: 1;
+}
+
+.lsif-ts-ext-symbol-children li:hover::after {
+    background-color: #e8e8e8;
+}
+
+.lsif-ts-ext-symbol-children li:after {
     width: 100%;
+    height: 22px;
+    left: 0px;
+    content: '';
+    z-index: -1;
+    position: absolute;
 }
 
-.lsif-ts-ext-textdocument-symbols-container li:hover {
+.lsif-tsc-outer-li:hover {
     background-color: #e8e8e8;
 }
 
