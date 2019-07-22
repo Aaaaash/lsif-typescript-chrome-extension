@@ -218,16 +218,16 @@ export class GitHubCodeView {
                         const hoverActionElement = document.createElement('div');
                         hoverActionElement.className = 'lsif-ts-ext-hover-detail-container';
                         hoverActionElement.style.left = `${targetNode.offsetLeft}px`;
-                        hoverActionElement.style.bottom = `${targetNodePosition.height + 4}px`;
+                        hoverActionElement.style.bottom = `${targetNodePosition.height + 2}px`;
 
                         if(Array.isArray(response.contents)) {
                             // @ts-ignore
                             const mdString = `${'```ts'}\n${response.contents[0].value}\n${'```'}`
-                            hoverActionElement.innerHTML = marked(mdString);
+                            hoverActionElement.innerHTML = `<div class="lsif-ts-ext-hover-title">${marked(mdString)}</div>`;
 
                             if (response.contents[1]) {
                                 // @ts-ignore
-                                hoverActionElement.innerHTML += `<div class="lsif-ts-ext-hover-detail-mdstring">${marked(response.contents[1])}</div>`;
+                                hoverActionElement.innerHTML += `<div class="lsif-ts-ext-hover-detail">${marked(response.contents[1])}</div>`;
                             }
                         } else {
                             // @ts-ignore

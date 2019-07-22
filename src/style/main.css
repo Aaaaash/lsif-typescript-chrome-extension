@@ -88,33 +88,36 @@
 
 .lsif-ts-ext-hover-detail-container {
     position: absolute;
-    border-radius: 2px;
     border: 1px solid #ccc;
     background-color: #fff;
-    padding: 10px;
+    padding: 0px;
     font-size: 12px;
     line-height: 1;
     overflow: auto;
-    max-width: 350px;
+    white-space: initial;
     font-family: "SFMono-Regular,Consolas,Liberation Mono,Menlo,Courier,monospace";
-}
-
-.lsif-ts-ext-hover-detail-container .lsif-ts-ext-hover-detail-description {
-    color: cadetblue;
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 10px;
-    max-width: 350px;
-    white-space: pre-line;
 }
 
 .lsif-ts-ext-highlight-target {
     background-color: wheat;
 }
 
-.lsif-ts-ext-hover-detail-mdstring {
+.lsif-ts-ext-hover-title {
+    line-height: 22px;
+    padding: 0px 5px;
+    width: 100%;
+}
+
+.lsif-ts-ext-hover-detail {
+    border-top: 1px solid #ccc;
     line-height: 1;
-    margin-top: 5px;
     white-space: pre-wrap;
-    max-width: 500px;
+    width: 100%;
     overflow-x: auto;
+    padding: 5px 5px 0px 5px;
+}
+
+.lsif-ts-ext-hover-detail p {
+    padding: 0px;
+    margin: 0px;
 }
