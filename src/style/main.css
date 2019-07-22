@@ -50,7 +50,6 @@
 
 .lsif-ts-ext-symbol-children {
     width: 100%;
-    position: relative;
 }
 
 .lsif-ts-ext-symbol-children::before {

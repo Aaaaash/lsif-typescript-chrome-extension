@@ -16,7 +16,7 @@ import { logger, field } from '../logger';
 import { ContentConnection } from '../connection';
 import { InitializeArguments, InitializeResponse, InitializeFaliedResponse, DocumentSymbolArguments } from '../protocol';
 import { Disposable } from '../types';
-import { symbolKindNames } from '../constants';
+import { symbolKindNames, removeQuotes } from '../constants';
 import '../style/symbol-icons.css';
 import { DocumentSymbol } from 'vscode-languageserver-types';
 
@@ -116,7 +116,7 @@ export class GitHubCodeView {
             } else if (ev.target && ev.target.dataset['lineSymbol'] && ev.target.dataset['expanded']) {
                 const { lineSymbol, expanded } = ev.target.dataset;
                 const [ symbolName, line ] = lineSymbol.split(':');
-                const childrenContainer = document.querySelector(`#lsif-ts-ext-symbol-children-${symbolName}-${line}`);
+                const childrenContainer = document.querySelector(`#lsif-ts-ext-symbol-children-${symbolName.replace(removeQuotes, '')}-${line}`);
 
                 if (JSON.parse(expanded)) {
                     // @ts-ignore
@@ -167,7 +167,7 @@ export class GitHubCodeView {
         `<ul
             style="padding-left: 24px; display: none"
             class="lsif-ts-ext-symbol-children"
-            id="lsif-ts-ext-symbol-children-${symbolItem.name}-${symbolItem.range.start.line + 1}">
+            id="lsif-ts-ext-symbol-children-${symbolItem.name.replace(removeQuotes, '')}-${symbolItem.range.start.line + 1}">
             ${this.makeSymbolTree(symbolItem.children, deep + 1)}
         </ul>` :
         ''}

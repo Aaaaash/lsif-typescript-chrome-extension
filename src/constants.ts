@@ -36,3 +36,5 @@ export const symbolKindNames = {
     [SymbolKind.TypeParameter]: 'type parameter',
     [SymbolKind.Variable]: 'variable',
 }
+
+export const removeQuotes = /^\'|"|\'|"$/g;
