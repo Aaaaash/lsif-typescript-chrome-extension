@@ -17,31 +17,33 @@ const startup = (connection: ContentConnection, githubUrl): void => {
     });
 }
 
-if(checkIsGitHubDotCom()) {
+if (checkIsGitHubDotCom()) {
     logger.info('LSIF Extension is running.');
     const githubUrl = parseURL(window.location);
 
     if (githubUrl) {
-        logger.info('GitHub Repo infomation', field('repo', githubUrl));
+        logger.info('GitHub Repository infomation', field('repo', githubUrl));
 
-        logger.debug('Check message channel connect status...');
+        switch (githubUrl.pageType) {
+            // Only enable in blob page for now.
+            case 'blob':
+            {
+                logger.info('GitHub blob page, enable code navigate and hover action.');
+                const messagePort = chrome.runtime.connect({ name: TypeScriptExtensionsChannel });
+                const connection = new ContentConnection(messagePort);
 
-        const messagePort = chrome.runtime.connect({ name: TypeScriptExtensionsChannel });
-        const connection = new ContentConnection(messagePort);
-
-        connection.checkConnect()
-            .then((response) => {
-                logger.debug(`Check connect ${response}`);
-                if (response === ServerConnectStatus.connected) {
-                    startup(connection, githubUrl);
-                }
-            });
-
-        // connection.onRestartup(() => {
-        //     const messagePort = chrome.runtime.connect({ name: TypeScriptExtensionsChannel });
-        //     const newConnection = new ContentConnection(messagePort);
-        //     startup(newConnection, githubUrl);
-        // });
+                connection.checkConnect()
+                    .then((response) => {
+                        logger.debug(`Check connect ${response}`);
+                        if (response === ServerConnectStatus.connected) {
+                            startup(connection, githubUrl);
+                        }
+                    });
+                break;
+            }
+            default:
+                break;
+        }
     } else {
         logger.info('No GitHub repository found.');
     }
