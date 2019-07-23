@@ -15,4 +15,4 @@
 - 支持不刷新文件跳转 (项目内)
 - 支持 gotoDefinition
 - 支持 findReferences
-- 支持 CODING interprise (有限的)
+- ~~支持 CODING interprise (有限的)~~
