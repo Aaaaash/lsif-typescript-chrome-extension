@@ -32,6 +32,6 @@ export enum PostMessageEventType {
 };
 
 export enum RepoType {
-    github = 'GITHUB',
-    coding = 'CODING', // CODING Enterprise.
+    github = 'GitHub',
+    coding = 'CODING Enterprise', // CODING Enterprise.
 };
