@@ -2,7 +2,7 @@ import { parseRepoURL, checkAndEnsureRepoType } from './utils';
 import { logger, field } from './logger';
 import { ContentConnection } from './connection';
 import { TypeScriptExtensionsChannel } from './constants';
-import { GitHubCodeView as CodeView } from './codeViews';
+import { CodeView } from './codeview';
 import { ServerConnectStatus, RepoType } from './types';
 
 import './style/main.css';

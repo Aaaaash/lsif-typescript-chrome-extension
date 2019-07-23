@@ -1,6 +1,5 @@
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
-import { logger } from './logger';
 import { MessageReader, MessageWriter, Connection } from './connection';
 import { Disposable, PostMessageEventType, ServerConnectStatus } from './types';
 import { runtimeMessageHandler } from './runtimeMessageHandler';
@@ -31,6 +30,7 @@ export function startup(
     return {
         dispose: () => {
             chrome.runtime.onConnect.removeListener(messageHandler);
+            connection.dispose();
         },
     };
 }

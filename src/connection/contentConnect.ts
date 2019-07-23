@@ -65,6 +65,7 @@ export class ContentConnection {
     }
 
     public dispose(): void {
+        this.req = 0;
         this.messagePort.disconnect();
     }
 

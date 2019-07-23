@@ -2,6 +2,7 @@ import { debounce } from 'lodash';
 import * as marked from 'marked';
 import * as hljs from 'highlight.js';
 import { lsp } from 'lsif-protocol';
+import { DocumentSymbol } from 'vscode-languageserver-types';
 import 'highlight.js/styles/github.css';
 
 import {
@@ -18,7 +19,6 @@ import { InitializeArguments, InitializeResponse, InitializeFaliedResponse, Docu
 import { Disposable, RepoType } from '../types';
 import { symbolKindNames, removeQuotes } from '../constants';
 import '../style/symbol-icons.css';
-import { DocumentSymbol } from 'vscode-languageserver-types';
 
 marked.setOptions({
     highlight: (code: string, lang: string) => hljs.highlight(lang, code).value,
@@ -32,7 +32,7 @@ interface BlobDetail {
     project: string;
 }
 
-export class GitHubCodeView {
+export class CodeView {
 
     private disposes: Disposable[] = [];
 
@@ -44,7 +44,11 @@ export class GitHubCodeView {
 
     private blobDetail: BlobDetail | undefined;
 
-    constructor(private connection: ContentConnection, private repoType: RepoType) {}
+    private pressing: boolean = false;
+
+    constructor(private connection: ContentConnection, private repoType: RepoType) {
+        this.disposes.push(this.addCtrlEventListener());
+    }
 
     public start(gitUrl: RepoUrlType): void {
         const cloneUrl = this.prepareCloneUrl(gitUrl);
@@ -53,8 +57,9 @@ export class GitHubCodeView {
         logger.info('Prepare initialize LSIF server.', field('url', cloneUrl));
 
         if (gitUrl.pageType === 'blob') {
-            this.relativePath = gitUrl.revAndFilePath.split('/').slice(1).join('/')
-            this.commit = gitUrl.revAndFilePath.split('/').shift();
+            this.relativePath = gitUrl.revAndFilePath.split('/').slice(1).join('/');
+            const revAndFileArray = gitUrl.revAndFilePath.split('/');
+            this.commit = revAndFileArray[0] === 'release' ? `${revAndFileArray[0]}/${revAndFileArray[1]}` : revAndFileArray[0];
         }
 
         this.initialize(gitUrl, cloneUrl);
@@ -112,12 +117,12 @@ export class GitHubCodeView {
         }
     }
 
-    private prepareBlobJumpUrl(domain: string, owner: string, project: string, line): string {
+    private prepareBlobJumpUrl(domain: string, owner: string, project: string, line: number | string, filePath: string): string {
         switch(this.repoType) {
             case RepoType.github:
-                return `https:\/\/${domain}\/${owner}\/${project}\/blob\/${this.commit}\/${this.relativePath}#L${line}`;
+                return `https:\/\/${domain}\/${owner}\/${project}\/blob\/${this.commit}\/${filePath}#L${line}`;
             case RepoType.coding:
-                return `https:\/\/${domain}\/p/${project}\/git/blob\/${this.commit}\/${this.relativePath}#L${line}`;
+                return `https:\/\/${domain}\/p/${project}\/git/blob\/${this.commit}\/${filePath}#L${line}`;
             default:
                 return 'blank';
         }
@@ -171,7 +176,7 @@ export class GitHubCodeView {
             }
             if (ev.target !== parent && ev.target.dataset['symbolLink']) {
                 const { domain, owner, project, line } = ev.target.dataset;
-                window.location.href = this.prepareBlobJumpUrl(domain, owner, project, line);
+                window.location.href = this.prepareBlobJumpUrl(domain, owner, project, line, this.relativePath);
             } else if (ev.target && ev.target.dataset['lineSymbol'] && ev.target.dataset['expanded']) {
                 const { lineSymbol, expanded } = ev.target.dataset;
                 const [ symbolName, line ] = lineSymbol.split(':');
@@ -256,6 +261,51 @@ export class GitHubCodeView {
         }
     }
 
+    private addCtrlEventListener(): Disposable {
+        const keyDown = (ev: KeyboardEvent): void => {
+            if (ev.keyCode === 93) {
+                this.pressing = true
+            }
+        };
+
+        const keyUp = (ev: KeyboardEvent): void => {
+            if (ev.keyCode === 93) {
+                this.pressing = false;
+            }
+        };
+
+        document.addEventListener('keydown', keyDown);
+        document.addEventListener('keyup', keyUp);
+        return {
+            dispose: () => {
+                document.removeEventListener('keydown', keyDown);
+                document.removeEventListener('keyup', keyUp);
+            }
+        }
+    }
+
+    private handleTargetNodeClick = async (position): Promise<void> =>  {
+        const definitionArgs = {
+            textDocument: {
+                uri: this.relativePath,
+            },
+            position,
+        };
+        const definitions = await this.connection.sendRequest<{}, lsp.Location[] | undefined>('gotoDefinition', definitionArgs);
+        if (definitions && definitions.length) {
+            const definition = definitions[0];
+            const { uri, range } = definition;
+
+            if (!uri.startsWith('file://')) {
+                const { domain, owner, project } = this.blobDetail;
+                const href = this.prepareBlobJumpUrl(domain, owner, project, range.start.line + 1, uri);
+                window.location.href = href;
+            } else {
+                // Do nothing
+            }
+        }
+    }
+
     private hoverAction = async (ev: MouseEvent): Promise<void> => {
         if (this.codeView && this.relativePath) {
             const targetNode = ev.target;
@@ -293,12 +343,25 @@ export class GitHubCodeView {
                             hoverActionElement.innerHTML = marked(mdString);
                         }
 
+                        if (this.pressing) {
+                            targetNode.classList.add('lsif-ts-ext-underlint-target');
+                        }
+    
                         targetNode.classList.add('lsif-ts-ext-highlight-target');
-                        targetNode.appendChild(hoverActionElement);                        
+                        targetNode.appendChild(hoverActionElement);
+
+                        const clickHandler = (): void => {
+                            this.handleTargetNodeClick(position);
+                        };
+
+                        targetNode.addEventListener('click', clickHandler);
+
                         const clearActionNode = (): void => {
                             targetNode.removeChild(hoverActionElement);
                             targetNode.classList.remove('lsif-ts-ext-highlight-target');
+                            targetNode.classList.remove('lsif-ts-ext-underlint-target');
                             targetNode.removeEventListener('mouseleave', clearActionNode);
+                            targetNode.removeEventListener('click', clickHandler);
                         };
                         targetNode.addEventListener('mouseleave', clearActionNode);
 

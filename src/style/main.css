@@ -115,3 +115,8 @@
     padding: 0px;
     margin: 0px;
 }
+
+.lsif-ts-ext-underlint-target {
+    text-decoration: underline;
+    text-decoration-color: cyan;
+}

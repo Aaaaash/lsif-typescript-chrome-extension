@@ -43,12 +43,16 @@ export class Connection {
         });
         return new Promise((resolve, reject) => {
             logger.debug('Send Message', field('message', requestMessage));
-            this.messageWriter.write(requestMessage);
-
             const callback: CallbackFn = (result: R): void => {
                 resolve(result);
             };
             this.requestCallbacks.set(id, callback);
+            this.messageWriter.write(requestMessage);
         });
+    }
+    
+    public dispose(): void {
+        this.req = 0;
+        this.messageReader.dispose();
     }
 }
