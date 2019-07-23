@@ -8,14 +8,14 @@ import {
     memoizedFindCodeCellFromContainer,
     checkTargetIsCodeCellOrChildnodes,
     convertPositionFromCodeCell,
-    parseURL,
+    parseRepoURL,
     checkIsCodeView,
     fillTextNodeForCodeCell,
 } from '../utils';
 import { logger, field } from '../logger';
 import { ContentConnection } from '../connection';
 import { InitializeArguments, InitializeResponse, InitializeFaliedResponse, DocumentSymbolArguments } from '../protocol';
-import { Disposable } from '../types';
+import { Disposable, RepoType } from '../types';
 import { symbolKindNames, removeQuotes } from '../constants';
 import '../style/symbol-icons.css';
 import { DocumentSymbol } from 'vscode-languageserver-types';
@@ -24,7 +24,7 @@ marked.setOptions({
     highlight: (code: string, lang: string) => hljs.highlight(lang, code).value,
 });
 
-type GitHubUrlType = ReturnType<typeof parseURL>;
+type RepoUrlType = ReturnType<typeof parseRepoURL>;
 
 interface BlobDetail {
     domain: string;
@@ -44,26 +44,83 @@ export class GitHubCodeView {
 
     private blobDetail: BlobDetail | undefined;
 
-    constructor(private connection: ContentConnection) {}
+    constructor(private connection: ContentConnection, private repoType: RepoType) {}
 
-    public start(githubUrl: GitHubUrlType): void {
-        const [ domain, owner, project ] = githubUrl.rawRepoName.split('/');
-        const cloneUrl = `git@${domain}:${owner}/${project}`;
-
-        this.blobDetail = {
-            domain,
-            owner,
-            project,
-        };
+    public start(gitUrl: RepoUrlType): void {
+        const cloneUrl = this.prepareCloneUrl(gitUrl);
+        this.blobDetail = this.prapreBlobDetail(gitUrl);
 
         logger.info('Prepare initialize LSIF server.', field('url', cloneUrl));
 
-        if (githubUrl.pageType === 'blob') {
-            this.relativePath = githubUrl.revAndFilePath.split('/').slice(1).join('/')
-            this.commit = githubUrl.revAndFilePath.split('/').shift();
+        if (gitUrl.pageType === 'blob') {
+            this.relativePath = gitUrl.revAndFilePath.split('/').slice(1).join('/')
+            this.commit = gitUrl.revAndFilePath.split('/').shift();
         }
 
-        this.initialize(githubUrl, cloneUrl);
+        this.initialize(gitUrl, cloneUrl);
+    }
+
+    private prepareCloneUrl(gitUrl: RepoUrlType): string | undefined {
+        switch(this.repoType) {
+            case RepoType.github: {
+                const [ domain, owner, project ] = gitUrl.rawRepoName.split('/');
+                const cloneUrl = `git@${domain}:${owner}/${project}`;
+                return cloneUrl;
+            }
+            case RepoType.coding: {
+                const [ ownerDomain, project ] = gitUrl.rawRepoName.split('/');
+                const [ ownerName ] = ownerDomain.split('.');
+                const cloneUrl = `git@e.coding.net:${ownerName}/${project}`;
+                return cloneUrl;
+            }
+            default:
+                return undefined;
+        }
+    }
+
+    private prapreBlobDetail(gitUrl: RepoUrlType): BlobDetail {
+        switch(this.repoType) {
+            case RepoType.github: {
+                const [ domain, owner, project ] = gitUrl.rawRepoName.split('/');
+                return { domain, owner, project };
+            }
+            case RepoType.coding: {
+                const [ domain, project ] = gitUrl.rawRepoName.split('/');
+                const [ owner ] = domain.split('/');
+                return {
+                    domain,
+                    owner,
+                    project,
+                };
+            }
+            default:
+                return undefined;
+        }
+    }
+
+    private prepareProjectName(gitUrl: RepoUrlType): string {
+        switch (this.repoType) {
+            case RepoType.github: 
+                return gitUrl.rawRepoName;
+            case RepoType.coding: {
+                const [ domain, project ] = gitUrl.rawRepoName.split('/');
+                const [ domainName ] = domain.split('.');
+                return `${domainName}/${project}`;
+            }
+            default:
+                return gitUrl.rawRepoName;
+        }
+    }
+
+    private prepareBlobJumpUrl(domain: string, owner: string, project: string, line): string {
+        switch(this.repoType) {
+            case RepoType.github:
+                return `https:\/\/${domain}\/${owner}\/${project}\/blob\/${this.commit}\/${this.relativePath}#L${line}`;
+            case RepoType.coding:
+                return `https:\/\/${domain}\/p/${project}\/git/blob\/${this.commit}\/${this.relativePath}#L${line}`;
+            default:
+                return 'blank';
+        }
     }
 
     public dispose(): void {
@@ -72,35 +129,37 @@ export class GitHubCodeView {
         }
     }
 
-    private async initialize(githubUrl: GitHubUrlType, cloneUrl: string): Promise<void> {
+    private async initialize(githubUrl: RepoUrlType, cloneUrl: string): Promise<void> {
         const initArguments = {
-            projectName: githubUrl.rawRepoName,
+            projectName: this.prepareProjectName(githubUrl),
             url: cloneUrl,
             commit: this.commit && this.commit,
         }
 
         const initResult = await this.connection.sendRequest<InitializeArguments, InitializeResponse | InitializeFaliedResponse>('initialize', initArguments);
-        logger.info(`Initialize: ${initResult.initialized ? 'success' : 'failed'} ${initResult.initialized === false && initResult.message}`);
+        logger.info(`Initialize: ${initResult.initialized ? 'success' : 'failed'} ${initResult.initialized === false ? initResult.message : ''}`);
 
         if(initResult.initialized) {
-            this.documentSymbols(githubUrl);
+            await this.documentSymbols(githubUrl);
 
-            // Find all code cells from vode view.
-            const codeView = document.querySelector('table');
-            const isCodeView = checkIsCodeView(codeView);
-
-            if (isCodeView) {
-                logger.info('Fill code cells');
-                fillTextNodeForCodeCell(codeView);
-
-                this.codeView = codeView;
-                const debouncedHoverAction = debounce(this.hoverAction, 250);
-                this.codeView.addEventListener('mousemove', debouncedHoverAction);
-                this.disposes.push({
-                    dispose: () => {
-                        this.codeView.removeEventListener('mousemove', debouncedHoverAction);
-                    },
-                });
+            if (this.repoType === RepoType.github) {
+                // Find all code cells from vode view.
+                const codeView = document.querySelector('table');
+                const isCodeView = checkIsCodeView(codeView);
+    
+                if (isCodeView) {
+                    logger.info('Fill code cells');
+                    fillTextNodeForCodeCell(codeView);
+    
+                    this.codeView = codeView;
+                    const debouncedHoverAction = debounce(this.hoverAction, 250);
+                    this.codeView.addEventListener('mousemove', debouncedHoverAction);
+                    this.disposes.push({
+                        dispose: () => {
+                            this.codeView.removeEventListener('mousemove', debouncedHoverAction);
+                        },
+                    });
+                }
             }
         }
     }
@@ -112,7 +171,7 @@ export class GitHubCodeView {
             }
             if (ev.target !== parent && ev.target.dataset['symbolLink']) {
                 const { domain, owner, project, line } = ev.target.dataset;
-                window.location.href = `https:\/\/${domain}\/${owner}\/${project}\/blob\/${this.commit}\/${this.relativePath}#L${line}`;
+                window.location.href = this.prepareBlobJumpUrl(domain, owner, project, line);
             } else if (ev.target && ev.target.dataset['lineSymbol'] && ev.target.dataset['expanded']) {
                 const { lineSymbol, expanded } = ev.target.dataset;
                 const [ symbolName, line ] = lineSymbol.split(':');
@@ -174,7 +233,7 @@ export class GitHubCodeView {
         `).join('');
     }
 
-    private async documentSymbols(githubUrl: GitHubUrlType): Promise<void> {
+    private async documentSymbols(githubUrl: RepoUrlType): Promise<void> {
         if (githubUrl.pageType === 'blob') {
             const documentSymbolArgument = {
                 textDocument: {

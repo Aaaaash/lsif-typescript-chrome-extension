@@ -13,6 +13,7 @@
     user-select: none;
     max-width: 300px;
     width: 300px;
+    z-index: 100;
     font-family: "SFMono-Regular,Consolas,Liberation Mono,Menlo,Courier,monospace";
 }
 

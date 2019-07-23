@@ -1,14 +1,14 @@
-import { checkIsGitHubDotCom, parseURL } from './utils';
+import { parseRepoURL, checkAndEnsureRepoType } from './utils';
 import { logger, field } from './logger';
 import { ContentConnection } from './connection';
 import { TypeScriptExtensionsChannel } from './constants';
-import { GitHubCodeView } from './codeViews';
-import { ServerConnectStatus } from './types';
+import { GitHubCodeView as CodeView } from './codeViews';
+import { ServerConnectStatus, RepoType } from './types';
 
 import './style/main.css';
 
-const startup = (connection: ContentConnection, githubUrl): void => {
-    const codeview = new GitHubCodeView(connection);
+const startup = (connection: ContentConnection, githubUrl, repoType: RepoType): void => {
+    const codeview = new CodeView(connection, repoType);
     codeview.start(githubUrl);
 
     connection.onDispose(() => {
@@ -17,18 +17,20 @@ const startup = (connection: ContentConnection, githubUrl): void => {
     });
 }
 
-if (checkIsGitHubDotCom()) {
-    logger.info('LSIF Extension is running.');
-    const githubUrl = parseURL(window.location);
+const repoType = checkAndEnsureRepoType();
+
+if (repoType) {
+    logger.info(`LSIF Extension is running for ${repoType}.`);
+    const githubUrl = parseRepoURL(repoType, window.location);
 
     if (githubUrl) {
-        logger.info('GitHub Repository infomation', field('repo', githubUrl));
+        logger.info(`${repoType} Repository.`, field('repo', githubUrl));
 
         switch (githubUrl.pageType) {
             // Only enable in blob page for now.
             case 'blob':
             {
-                logger.info('GitHub blob page, enable code navigate and hover action.');
+                logger.info(`${repoType} blob page.`);
                 const messagePort = chrome.runtime.connect({ name: TypeScriptExtensionsChannel });
                 const connection = new ContentConnection(messagePort);
 
@@ -36,7 +38,7 @@ if (checkIsGitHubDotCom()) {
                     .then((response) => {
                         logger.debug(`Check connect ${response}`);
                         if (response === ServerConnectStatus.connected) {
-                            startup(connection, githubUrl);
+                            startup(connection, githubUrl, repoType);
                         }
                     });
                 break;

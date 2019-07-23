@@ -30,3 +30,8 @@ export enum PostMessageEventType {
     reconnect = 'RECONNECT',
     restartup = 'RESTARTUP',
 };
+
+export enum RepoType {
+    github = 'GITHUB',
+    coding = 'CODING', // CODING Enterprise.
+};

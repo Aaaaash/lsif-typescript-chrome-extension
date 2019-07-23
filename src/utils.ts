@@ -1,9 +1,20 @@
 import { memoize } from 'lodash';
 
 import { githubCodeViewSelector, githubCodeCellSelector } from './constants';
-import { Position } from './types';
+import { Position, RepoType } from './types';
 
-export const checkIsGitHubDotCom = (): boolean => /^https?:\/\/(www.)?github.com/.test(window.location.href)
+export const checkIsGitHubDotCom = (): boolean => /^https?:\/\/(www.)?github.com/.test(window.location.href);
+
+export const checkIsCodingDotNet = (): boolean => /^https?:\/\/(\w+.)?coding.net/.test(window.location.href);
+
+export const checkAndEnsureRepoType = (): RepoType | undefined => {
+    if (checkIsGitHubDotCom()) {
+        return RepoType.github;
+    } else if (checkIsCodingDotNet()) {
+        return RepoType.coding;
+    }
+    return undefined;
+}
 
 export interface RawRepoSpec {
     /**
@@ -14,13 +25,13 @@ export interface RawRepoSpec {
     rawRepoName: string;
 }
 
-type GitHubURL =
+type GitRepoURL =
     | ({ pageType: 'tree' | 'commit' | 'pull' | 'compare' | 'other' } & RawRepoSpec)
     | ({ pageType: 'blob'; revAndFilePath: string } & RawRepoSpec)
 
-export function parseURL(loc: Pick<Location, 'host' | 'pathname'> = window.location): GitHubURL | undefined {
+export function parseRepoURL(repoType: RepoType, loc: Pick<Location, 'host' | 'pathname'> = window.location): GitRepoURL | undefined {
     const { host, pathname } = loc;
-    const [user, ghRepoName, pageType, ...rest] = pathname.slice(1).split('/');
+    const [user, ghRepoName, pageType, ...rest] = pathname.slice(repoType === RepoType.github ? 1 : 3).split('/');
     if (!user || !ghRepoName) {
         return undefined;
     }
