@@ -11,7 +11,8 @@
 
 ### TODO
 
-- 优化 hover 样式
+- ~~优化 hover 样式~~
 - 支持 gotoDefinition
 - 支持 findReferences
-- 支持 CODING interprise
+- ~~支持 CODING interprise (有限的)~~
+- DOM 性能优化
