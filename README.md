@@ -11,7 +11,8 @@
 
 ### TODO
 
-- 优化 hover 样式
+- ~~优化 hover 样式~~
+- 支持不刷新文件跳转 (项目内)
 - 支持 gotoDefinition
 - 支持 findReferences
-- 支持 CODING interprise
+- 支持 CODING interprise (有限的)

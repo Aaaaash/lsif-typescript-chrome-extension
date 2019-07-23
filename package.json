@@ -6,7 +6,7 @@
   "scripts": {
     "compile": "tsc -p .",
     "build": "rm -rf out && webpack --config ./webpack.config.js --mode=production --progress",
-    "dev": "webpack --config ./webpack.config.js --mode=development --progress --watch",
+    "start": "webpack --config ./webpack.config.js --mode=development --progress --watch",
     "lint": "./node_modules/.bin/eslint --ext .ts ./ --ignore-pattern ./.eslintignore",
     "lint:fix": "./node_modules/.bin/eslint --ext .ts ./ --ignore-pattern ./.eslintignore --fix"
   },
