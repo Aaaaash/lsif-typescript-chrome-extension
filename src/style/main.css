@@ -52,17 +52,6 @@
     width: 100%;
 }
 
-/* .lsif-ts-ext-symbol-children::before {
-    content: '';
-    width: 1px;
-    height: 100%;
-    position: absolute;
-    background-color: #ccc;
-    left: 24px;
-    opacity: 0;
-    transition: opacity ease-in 0.1s;
-} */
-
 .lsif-ts-ext-symbol-children li {
     box-sizing: border-box;
     border-left: 1px solid transparent;
