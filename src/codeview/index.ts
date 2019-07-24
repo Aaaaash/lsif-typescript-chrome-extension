@@ -44,9 +44,14 @@ export class CodeView {
 
     private blobDetail: BlobDetail | undefined;
 
+    private repository: string;
+
     constructor(private connection: ContentConnection, private repoType: RepoType) {}
 
     public start(gitUrl: RepoUrlType): void {
+        const [_, owner, project] = gitUrl.rawRepoName.split('/');
+        this.repository = `${owner}@${project}`;
+ 
         const cloneUrl = this.prepareCloneUrl(gitUrl);
         this.blobDetail = this.prapreBlobDetail(gitUrl);
 
@@ -131,13 +136,14 @@ export class CodeView {
     }
 
     private async initialize(githubUrl: RepoUrlType, cloneUrl: string): Promise<void> {
-        const initArguments = {
-            projectName: this.prepareProjectName(githubUrl),
-            url: cloneUrl,
-            commit: this.commit && this.commit,
-        }
-
-        const initResult = await this.connection.sendRequest<InitializeArguments, InitializeResponse | InitializeFaliedResponse>('initialize', initArguments);
+        const initResult = await this.connection.sendRequest<InitializeArguments, InitializeResponse | InitializeFaliedResponse>(
+            'initialize',
+            {
+                repository: this.repository,
+                url: cloneUrl,
+                commit: this.commit,
+            },
+        );
         logger.info(`Initialize: ${initResult.initialized ? 'success' : 'failed'} ${initResult.initialized === false ? initResult.message : ''}`);
 
         if(initResult.initialized) {
@@ -236,13 +242,14 @@ export class CodeView {
 
     private async documentSymbols(githubUrl: RepoUrlType): Promise<void> {
         if (githubUrl.pageType === 'blob') {
-            const documentSymbolArgument = {
-                textDocument: {
-                    uri: this.relativePath
+            const documentSymbolTree = await this.connection.sendRequest<DocumentSymbolArguments, lsp.DocumentSymbol[] | undefined>(
+                'documentSymbol',
+                {
+                    textDocument: { uri: this.relativePath },
+                    repository: this.repository,
+                    commit: this.commit,
                 },
-            };
-
-            const documentSymbolTree = await this.connection.sendRequest<DocumentSymbolArguments, lsp.DocumentSymbol[] | undefined>('documentSymbol', documentSymbolArgument)
+            );
             const documentSymbolContainer = document.createElement('ul');
             documentSymbolContainer.innerHTML = this.makeSymbolTree(documentSymbolTree, 0);
             documentSymbolContainer.className = 'lsif-ts-ext-textdocument-symbols-container';
@@ -258,13 +265,17 @@ export class CodeView {
     }
 
     private handleTargetNodeClick = async (position): Promise<void> =>  {
-        const definitionArgs = {
-            textDocument: {
-                uri: this.relativePath,
-            },
-            position,
-        };
-        const definitions = await this.connection.sendRequest<{}, lsp.Location[] | undefined>('gotoDefinition', definitionArgs);
+        const definitions = await this.connection.sendRequest<{}, lsp.Location[] | undefined>(
+            'gotoDefinition',
+            {
+                textDocument: {
+                    uri: this.relativePath,
+                },
+                position,
+                repository: this.repository,
+                commit: this.commit,
+            }
+        );
         if (definitions && definitions.length) {
             const definition = definitions[0];
             const { uri, range } = definition;
@@ -288,13 +299,17 @@ export class CodeView {
                 if (checkTargetIsCodeCellOrChildnodes(targetNode, codeCells)) {
                     const position = convertPositionFromCodeCell(targetNode);
                     if (position) {
-                        const hoverArgs = {
-                            textDocument: {
-                                uri: this.relativePath,
-                            },
-                            position,
-                        };
-                        const response = await this.connection.sendRequest<{}, lsp.Hover | undefined>('hover', hoverArgs);
+                        const response = await this.connection.sendRequest<{}, lsp.Hover | undefined>(
+                            'hover',
+                            {
+                                textDocument: {
+                                    uri: this.relativePath,
+                                },
+                                position,
+                                repository: this.repository,
+                                commit: this.commit,
+                            }
+                        );
 
                         const targetNodePosition = targetNode.getBoundingClientRect();
                         const hoverActionElement = document.createElement('div');
