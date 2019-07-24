@@ -40,7 +40,11 @@ export class CodeView {
 
     private relativePath: string | undefined;
 
-    private commit: string | undefined;
+    // Branch, tag, or commit
+    private tagOrCommit: string | undefined;
+
+    // Only commit hash
+    private commit: string;
 
     private blobDetail: BlobDetail | undefined;
 
@@ -60,7 +64,7 @@ export class CodeView {
         if (gitUrl.pageType === 'blob') {
             this.relativePath = gitUrl.revAndFilePath.split('/').slice(1).join('/');
             const revAndFileArray = gitUrl.revAndFilePath.split('/');
-            this.commit = revAndFileArray[0] === 'release' ? `${revAndFileArray[0]}/${revAndFileArray[1]}` : revAndFileArray[0];
+            this.tagOrCommit = revAndFileArray[0] === 'release' ? `${revAndFileArray[0]}/${revAndFileArray[1]}` : revAndFileArray[0];
         }
 
         this.initialize(gitUrl, cloneUrl);
@@ -121,9 +125,9 @@ export class CodeView {
     private prepareBlobJumpUrl(domain: string, owner: string, project: string, line: number | string, filePath: string): string {
         switch(this.repoType) {
             case RepoType.github:
-                return `https:\/\/${domain}\/${owner}\/${project}\/blob\/${this.commit}\/${filePath}#L${line}`;
+                return `https:\/\/${domain}\/${owner}\/${project}\/blob\/${this.tagOrCommit}\/${filePath}#L${line}`;
             case RepoType.coding:
-                return `https:\/\/${domain}\/p/${project}\/git/blob\/${this.commit}\/${filePath}#L${line}`;
+                return `https:\/\/${domain}\/p/${project}\/git/blob\/${this.tagOrCommit}\/${filePath}#L${line}`;
             default:
                 return 'blank';
         }
@@ -147,6 +151,8 @@ export class CodeView {
         logger.info(`Initialize: ${initResult.initialized ? 'success' : 'failed'} ${initResult.initialized === false ? initResult.message : ''}`);
 
         if(initResult.initialized) {
+            this.commit = initResult.commit;
+
             await this.documentSymbols(githubUrl);
 
             if (this.repoType === RepoType.github) {

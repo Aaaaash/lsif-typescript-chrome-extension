@@ -28,6 +28,7 @@ export interface InitializeArguments {
 
 export interface InitializeResponse {
     initialized: true;
+    commit: string;
 };
 
 export interface InitializeFaliedResponse {
