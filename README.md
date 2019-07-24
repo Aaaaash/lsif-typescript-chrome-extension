@@ -7,10 +7,10 @@
 
 - Navigate to document symbols
 
-![](snapshot/navigate-to-symbol.png)
+![](snapshot/navigate.png)
 
 - Hover (show symbol type and description)
-![](snapshot/hover.gif)
+![](snapshot/hover.png)
 
 ### TODO
 
