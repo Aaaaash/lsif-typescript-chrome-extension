@@ -94,6 +94,12 @@
 
 .lsif-ts-ext-highlight-target {
     background-color: wheat;
+    cursor: pointer;
+}
+
+.lsif-ts-ext-underline-target {
+    text-decoration: underline;
+    text-decoration-color: bisque;
 }
 
 .lsif-ts-ext-hover-title {
@@ -114,9 +120,4 @@
 .lsif-ts-ext-hover-detail p {
     padding: 0px;
     margin: 0px;
-}
-
-.lsif-ts-ext-underlint-target {
-    text-decoration: underline;
-    text-decoration-color: cyan;
 }

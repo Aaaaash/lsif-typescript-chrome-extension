@@ -44,11 +44,7 @@ export class CodeView {
 
     private blobDetail: BlobDetail | undefined;
 
-    private pressing: boolean = false;
-
-    constructor(private connection: ContentConnection, private repoType: RepoType) {
-        this.disposes.push(this.addCtrlEventListener());
-    }
+    constructor(private connection: ContentConnection, private repoType: RepoType) {}
 
     public start(gitUrl: RepoUrlType): void {
         const cloneUrl = this.prepareCloneUrl(gitUrl);
@@ -261,29 +257,6 @@ export class CodeView {
         }
     }
 
-    private addCtrlEventListener(): Disposable {
-        const keyDown = (ev: KeyboardEvent): void => {
-            if (ev.keyCode === 93) {
-                this.pressing = true
-            }
-        };
-
-        const keyUp = (ev: KeyboardEvent): void => {
-            if (ev.keyCode === 93) {
-                this.pressing = false;
-            }
-        };
-
-        document.addEventListener('keydown', keyDown);
-        document.addEventListener('keyup', keyUp);
-        return {
-            dispose: () => {
-                document.removeEventListener('keydown', keyDown);
-                document.removeEventListener('keyup', keyUp);
-            }
-        }
-    }
-
     private handleTargetNodeClick = async (position): Promise<void> =>  {
         const definitionArgs = {
             textDocument: {
@@ -301,7 +274,7 @@ export class CodeView {
                 const href = this.prepareBlobJumpUrl(domain, owner, project, range.start.line + 1, uri);
                 window.location.href = href;
             } else {
-                // Do nothing
+                logger.warn(`Can not jump to file ${uri}`);
             }
         }
     }
@@ -343,10 +316,7 @@ export class CodeView {
                             hoverActionElement.innerHTML = marked(mdString);
                         }
 
-                        if (this.pressing) {
-                            targetNode.classList.add('lsif-ts-ext-underlint-target');
-                        }
-    
+                        targetNode.classList.add('lsif-ts-ext-underline-target');
                         targetNode.classList.add('lsif-ts-ext-highlight-target');
                         targetNode.appendChild(hoverActionElement);
 
@@ -359,7 +329,7 @@ export class CodeView {
                         const clearActionNode = (): void => {
                             targetNode.removeChild(hoverActionElement);
                             targetNode.classList.remove('lsif-ts-ext-highlight-target');
-                            targetNode.classList.remove('lsif-ts-ext-underlint-target');
+                            targetNode.classList.remove('lsif-ts-ext-underline-target');
                             targetNode.removeEventListener('mouseleave', clearActionNode);
                             targetNode.removeEventListener('click', clickHandler);
                         };
