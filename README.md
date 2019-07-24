@@ -1,4 +1,7 @@
 ## LSIF TypeScript Chrome Extensions
+
+[![Build Status](https://travis-ci.org/Aaaaash/lsif-typescript-chrome-extension.svg?branch=master)](https://travis-ci.org/Aaaaash/lsif-typescript-chrome-extension)
+
 ![](snapshot/all.gif)
 ### Features
 
