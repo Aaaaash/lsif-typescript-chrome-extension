@@ -322,6 +322,7 @@ export class CodeView {
 
                         const clickHandler = (): void => {
                             this.handleTargetNodeClick(position);
+                            targetNode.removeEventListener('click', clickHandler);
                         };
 
                         targetNode.addEventListener('click', clickHandler);
