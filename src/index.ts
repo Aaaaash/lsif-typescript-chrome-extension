@@ -17,6 +17,20 @@ const startup = (connection: ContentConnection, githubUrl, repoType: RepoType): 
     });
 }
 
+const startupWithBlobPage = (githubUrl, repoType: RepoType): void => {
+    logger.info(`${repoType} blob page.`);
+    const messagePort = chrome.runtime.connect({ name: TypeScriptExtensionsChannel });
+    const connection = new ContentConnection(messagePort);
+
+    connection.checkConnect()
+        .then((response) => {
+            logger.debug(`Check connect ${response}`);
+            if (response === ServerConnectStatus.connected) {
+                startup(connection, githubUrl, repoType);
+            }
+        });
+}
+
 const repoType = checkAndEnsureRepoType();
 
 if (repoType) {
@@ -29,20 +43,8 @@ if (repoType) {
         switch (githubUrl.pageType) {
             // Only enable in blob page for now.
             case 'blob':
-            {
-                logger.info(`${repoType} blob page.`);
-                const messagePort = chrome.runtime.connect({ name: TypeScriptExtensionsChannel });
-                const connection = new ContentConnection(messagePort);
-
-                connection.checkConnect()
-                    .then((response) => {
-                        logger.debug(`Check connect ${response}`);
-                        if (response === ServerConnectStatus.connected) {
-                            startup(connection, githubUrl, repoType);
-                        }
-                    });
+                startupWithBlobPage(githubUrl, repoType);
                 break;
-            }
             default:
                 break;
         }
