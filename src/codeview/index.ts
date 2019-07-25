@@ -17,7 +17,7 @@ import { logger, field } from '../logger';
 import { ContentConnection } from '../connection';
 import { InitializeArguments, InitializeResponse, InitializeFaliedResponse, DocumentSymbolArguments } from '../protocol';
 import { Disposable, RepoType } from '../types';
-import { symbolKindNames, removeQuotes } from '../constants';
+import { symbolKindNames, quotesReg } from '../constants';
 import '../style/symbol-icons.css';
 
 marked.setOptions({
@@ -188,7 +188,7 @@ export class CodeView {
             } else if (ev.target && ev.target.dataset['lineSymbol'] && ev.target.dataset['expanded']) {
                 const { lineSymbol, expanded } = ev.target.dataset;
                 const [ symbolName, line ] = lineSymbol.split(':');
-                const childrenContainer = document.querySelector(`#lsif-ts-ext-symbol-children-${symbolName.replace(removeQuotes, '')}-${line}`);
+                const childrenContainer = document.querySelector(`#lsif-ts-ext-symbol-children-${symbolName.replace(quotesReg, '')}-${line}`);
 
                 if (JSON.parse(expanded)) {
                     // @ts-ignore
@@ -239,7 +239,7 @@ export class CodeView {
         `<ul
             style="padding-left: 24px; display: none"
             class="lsif-ts-ext-symbol-children"
-            id="lsif-ts-ext-symbol-children-${symbolItem.name.replace(removeQuotes, '')}-${symbolItem.range.start.line + 1}">
+            id="lsif-ts-ext-symbol-children-${symbolItem.name.replace(quotesReg, '')}-${symbolItem.range.start.line + 1}">
             ${this.makeSymbolTree(symbolItem.children, deep + 1)}
         </ul>` :
         ''}

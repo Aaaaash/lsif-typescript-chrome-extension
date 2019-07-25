@@ -37,4 +37,4 @@ export const symbolKindNames = {
     [SymbolKind.Variable]: 'variable',
 }
 
-export const removeQuotes = /^\'|"|\'|"$/g;
+export const quotesReg = /^\'|"|\'|"$/g;
