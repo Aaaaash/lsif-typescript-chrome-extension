@@ -130,3 +130,10 @@ export const convertPositionFromCodeCell = (target: HTMLElement): Position | nul
     }
     return null;
 }
+
+export function injectContentScript(scriptUrl: string, target: HTMLBodyElement): void {
+    const script = document.createElement('script');
+    script.src = scriptUrl;
+    script.type = 'text/javascript';
+    target.appendChild(script);
+}

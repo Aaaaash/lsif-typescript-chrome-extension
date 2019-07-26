@@ -7,6 +7,35 @@ import { ServerConnectStatus, RepoType } from './types';
 
 import './style/main.css';
 
+function wrap(eventType: string): () => ReturnType<typeof window.top.history['pushState']> {
+    const origin = window.top.history[eventType];
+    return function () {
+        console.log('???');
+        console.log(arguments);
+        const rev = origin.apply(this, arguments);
+        const event = new Event(eventType);
+        // @ts-ignore
+        event.arguments = arguments;
+        window.top.dispatchEvent(event);
+        return rev;
+    }
+}
+
+const wrappedPushState = wrap('pushState');
+const wrappedReplaceState = wrap('replaceState');
+
+console.log(window.top === window);
+window.top.history.pushState = wrappedPushState;
+window.top.history.replaceState = wrappedReplaceState;
+
+window.top.addEventListener('replaceState', function (e) {
+    console.log('THEY DID IT AGAIN! replaceState 111111');
+});
+
+window.top.addEventListener('pushState', function (e) {
+    console.log('THEY DID IT AGAIN! pushState 2222222');
+});
+
 const startup = (connection: ContentConnection, githubUrl, repoType: RepoType): void => {
     const codeview = new CodeView(connection, repoType);
     codeview.start(githubUrl);
