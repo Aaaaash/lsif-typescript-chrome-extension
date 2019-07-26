@@ -12,6 +12,7 @@
 ![](snapshot/hover.png)
 
 - Go to definition
+
 ![](snapshot/hover-navigate-jump.gif)
 
 ### TODO
