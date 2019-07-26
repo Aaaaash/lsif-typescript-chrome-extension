@@ -32,7 +32,7 @@ interface BlobDetail {
     project: string;
 }
 
-export class CodeView {
+export class CodeHost {
 
     private disposes: Disposable[] = [];
 

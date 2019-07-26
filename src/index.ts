@@ -2,7 +2,7 @@ import { parseRepoURL, checkAndEnsureRepoType } from './utils';
 import { logger, field } from './logger';
 import { ContentConnection } from './connection';
 import { TypeScriptExtensionsChannel } from './constants';
-import { CodeView } from './codeview';
+import { CodeHost } from './codeHost';
 import { ServerConnectStatus, RepoType } from './types';
 
 import './style/main.css';
@@ -37,11 +37,11 @@ window.top.addEventListener('pushState', function (e) {
 });
 
 const startup = (connection: ContentConnection, githubUrl, repoType: RepoType): void => {
-    const codeview = new CodeView(connection, repoType);
-    codeview.start(githubUrl);
+    const codeHost = new CodeHost(connection, repoType);
+    codeHost.start(githubUrl);
 
     connection.onDispose(() => {
-        codeview.dispose();
+        codeHost.dispose();
         logger.info('Websocket disconnect, cleanup all effects.');
     });
 }
