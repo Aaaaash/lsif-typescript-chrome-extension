@@ -2,6 +2,7 @@
   "version": "0.0.1",
   "name": "LSIF TypeScript",
   "manifest_version": 2,
+  "id": "lsif-typescript-chrome-extension",
   "description": "Language Server Index Format for TypeScript",
   "browser_action": {
     "default_title": "LSIF",
@@ -18,20 +19,14 @@
     "128": "assets/icon-128.png"
   },
   "background": {
-    "scripts": [
-      "out/background.js"
-    ]
+    "scripts": ["out/background.js"]
   },
   "content_scripts": [
     {
-      "js": [
-        "out/index.js"
-      ],
-      "matches": [
-        "http://*/*",
-        "https://*/*"
-      ],
-      "run_at": "document_end"
+      "js": ["out/inject.js"],
+      "matches": ["http://*/*", "https://*/*"],
+      "run_at": "document_end",
+      "all_frames": true
     }
   ],
   "options_ui": {
@@ -41,12 +36,8 @@
   "storage": {
     "managed_schema": "schema.json"
   },
-  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
-  "web_accessible_resources": [
-    "img/*",
-    "css/style.bundle.css",
-    "css/options-style.bundle.css"
-  ],
+  "content_security_policy": "script-src 'self'; object-src 'self'",
+  "web_accessible_resources": ["out/content.js"],
   "omnibox": {
     "keyword": "src"
   },

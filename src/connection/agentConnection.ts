@@ -1,7 +1,7 @@
-import { PostMessageEventType, ServerConnectStatus, NormalEventType } from '../types';
+import { NormalEventType, PostMessageEventType, ServerConnectStatus } from '../types';
 
-export class ContentConnection {
-
+export class AgentConnection {
+    
     private req: number = 0;
 
     private responseCallBacks: Map<number, (response: any) => any> = new Map();
@@ -10,30 +10,37 @@ export class ContentConnection {
 
     private disposeCallback: () => void;
 
-    constructor(private messagePort: chrome.runtime.Port) {
-        messagePort.onMessage.addListener((message) => {
-            switch (message.event) {
-                case PostMessageEventType.response:
-                    const resHandler = this.responseCallBacks.get(message.id);
-                    resHandler(message.data.result);
-                    break;
-                case PostMessageEventType.normalEvent:
-                    const eventHandler = this.rpcEventCallbacks.get(message.data.eventType);
-                    eventHandler(message.data.result);
-                    break;
-                case PostMessageEventType.dispose:
-                    this.disposeCallback();
-                    break;
-                default:
-                    break;
-            }
-        });
+    constructor() {
+        window.addEventListener('message', this.postMessageHandler);
+    }
+
+    private postMessageHandler = (message: MessageEvent): void => {
+        if (message.data.source && message.data.source === 'agent-connection') {
+            return;
+        }
+
+        const { data: { event, id, data } } = message;
+        switch (event) {
+            case PostMessageEventType.response:
+                const resHandler = this.responseCallBacks.get(id);
+                resHandler(data.result);
+                break;
+            case PostMessageEventType.normalEvent:
+                const eventHandler = this.rpcEventCallbacks.get(data.eventType);
+                eventHandler(data.result);
+                break;
+            case PostMessageEventType.dispose:
+                this.disposeCallback();
+                break;
+            default:
+                break;
+        }
     }
 
     public sendRequest<T, R>(method: string, message: T): Promise<R> {
         const id = this.req += 1;
         return new Promise((resolve, reject) => {
-            this.messagePort.postMessage({
+            this.postMesasge({
                 id,
                 event: PostMessageEventType.request,
                 data: {
@@ -51,7 +58,7 @@ export class ContentConnection {
 
     public checkConnect(): Promise<ServerConnectStatus> {
         return new Promise((resolve, reject) => {
-            this.messagePort.postMessage({
+            this.postMesasge({
                 event: PostMessageEventType.normalEvent,
                 data: {
                     eventType: NormalEventType.checkConnect,
@@ -64,9 +71,13 @@ export class ContentConnection {
         });
     }
 
+    private postMesasge(message): void {
+        window.postMessage({ ...message, source: 'agent-connection' }, '*');
+    }
+
     public dispose(): void {
         this.req = 0;
-        this.messagePort.disconnect();
+        window.removeEventListener('message', this.postMessageHandler);
     }
 
     public onDispose(callback): void {

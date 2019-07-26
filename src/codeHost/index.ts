@@ -14,7 +14,7 @@ import {
     fillTextNodeForCodeCell,
 } from '../utils';
 import { logger, field } from '../logger';
-import { ContentConnection } from '../connection';
+import { AgentConnection } from '../connection';
 import { InitializeArguments, InitializeResponse, InitializeFaliedResponse, DocumentSymbolArguments } from '../protocol';
 import { Disposable, RepoType } from '../types';
 import { symbolKindNames, quotesReg } from '../constants';
@@ -50,7 +50,7 @@ export class CodeHost {
 
     private repository: string;
 
-    constructor(private connection: ContentConnection, private repoType: RepoType) {}
+    constructor(private connection: AgentConnection, private repoType: RepoType) {}
 
     public start(gitUrl: RepoUrlType): void {
         const [_, owner, project] = gitUrl.rawRepoName.split('/');

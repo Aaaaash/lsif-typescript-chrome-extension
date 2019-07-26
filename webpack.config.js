@@ -4,14 +4,16 @@ const path = require('path');
 
 module.exports = {
     entry: {
-        index: path.join(__dirname, 'src/index.ts'),
+        content: path.join(__dirname, 'src/content.ts'),
         background: path.join(__dirname, 'src/background.ts'),
         popup: path.join(__dirname, 'src/popup.tsx'),
+        inject: path.join(__dirname, 'src/injectScript.ts'),
     },
     output: {
         path: path.join(__dirname, 'out'),
         filename: '[name].js'
     },
+    devtool: 'source-map',
     mode: 'development',
     module: {
         rules: [
@@ -45,15 +47,6 @@ module.exports = {
         extensions: ['.ts', '.tsx', '.js']
     },
     plugins: [
-        new ChromeExtensionReloader({
-            port: 9090,
-            reloadPage: true,
-            entries: {
-                background: 'background',
-                content: 'content',
-                popup: 'popup'
-            }
-        }),
         new DefinePlugin({
             'global.process.env.LOG_LEVEL': '"debug"',
         })
