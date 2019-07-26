@@ -6,7 +6,11 @@ export class Agent {
 
     private messageOrigin: string;
 
-    constructor(private messagePort: chrome.runtime.Port) {}
+    constructor(private messagePort: chrome.runtime.Port) {
+        this.messagePort.onDisconnect.addListener((port) => {
+            logger.warn(`Message Port ${port.name} disconnect.`);
+        });
+    }
 
     private injectMessageHandler = (message: MessageEvent): void => {
         if (message.data.source && message.data.source === AGENT) {
@@ -42,5 +46,6 @@ export class Agent {
     public dispose(): void {
         window.removeEventListener('message', this.injectMessageHandler);
         this.messagePort.onMessage.removeListener(this.backgroundMesageHandler);
+        this.messagePort.disconnect();
     }
 }

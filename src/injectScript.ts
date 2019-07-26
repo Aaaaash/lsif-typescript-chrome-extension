@@ -1,5 +1,4 @@
 import { injectContentScript } from './utils';
-import { logger } from './logger';
 import { Agent } from './connection';
 import { TypeScriptExtensionsChannel } from './constants';
 

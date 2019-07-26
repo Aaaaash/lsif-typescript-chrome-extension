@@ -50,7 +50,9 @@ export class CodeHost {
 
     private repository: string;
 
-    constructor(private connection: AgentConnection, private repoType: RepoType) {}
+    constructor(private connection: AgentConnection, private repoType: RepoType) {
+        window.addEventListener('pushState', this.dispose);        
+    }
 
     public start(gitUrl: RepoUrlType): void {
         const [_, owner, project] = gitUrl.rawRepoName.split('/');
@@ -133,10 +135,11 @@ export class CodeHost {
         }
     }
 
-    public dispose(): void {
+    public dispose = (): void => {
         for(const disposable of this.disposes) {
             disposable.dispose();
         }
+        this.disposes = [];
     }
 
     private async initialize(githubUrl: RepoUrlType, cloneUrl: string): Promise<void> {

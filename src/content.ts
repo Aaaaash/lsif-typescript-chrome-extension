@@ -1,4 +1,4 @@
-import { parseRepoURL, checkAndEnsureRepoType } from './utils';
+import { parseRepoURL, checkAndEnsureRepoType, nativeHistoryWrapper } from './utils';
 import { logger, field } from './logger';
 import { AgentConnection } from './connection';
 import { CodeHost } from './codeHost';
@@ -7,33 +7,9 @@ import { ServerConnectStatus, RepoType } from './types';
 import './style/main.css';
 
 logger.info('Start Extensions.');
-// function wrap(eventType: string): () => ReturnType<typeof window.top.history['pushState']> {
-//     const origin = window.top.history[eventType];
-//     return function () {
-//         console.log('???');
-//         console.log(arguments);
-//         const rev = origin.apply(this, arguments);
-//         const event = new Event(eventType);
-//         // @ts-ignore
-//         event.arguments = arguments;
-//         window.top.dispatchEvent(event);
-//         return rev;
-//     }
-// }
 
-// const wrappedPushState = wrap('pushState');
-// const wrappedReplaceState = wrap('replaceState');
-
-// window.top.history.pushState = wrappedPushState;
-// window.top.history.replaceState = wrappedReplaceState;
-
-// window.top.addEventListener('replaceState', function (e) {
-//     console.log('THEY DID IT AGAIN! replaceState 111111');
-// });
-
-// window.top.addEventListener('pushState', function (e) {
-//     console.log('THEY DID IT AGAIN! pushState 2222222');
-// });
+const wrappedPushState = nativeHistoryWrapper('pushState');
+window.history.pushState = wrappedPushState;
 
 const startup = (agent: AgentConnection, githubUrl, repoType: RepoType): void => {
     const codeHost = new CodeHost(agent, repoType);
@@ -59,6 +35,13 @@ const startupWithBlobPage = (githubUrl, repoType: RepoType): void => {
 }
 
 const repoType = checkAndEnsureRepoType();
+
+window.addEventListener('pushState', function (e: any) {
+    const githubUrl = parseRepoURL(repoType, window.location);
+    if (githubUrl.pageType === 'blob') {
+        startupWithBlobPage(githubUrl, repoType);
+    }
+});
 
 if (repoType) {
     logger.info(`LSIF Extension is running for ${repoType}.`);

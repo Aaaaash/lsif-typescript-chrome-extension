@@ -137,3 +137,15 @@ export function injectContentScript(scriptUrl: string, target: HTMLBodyElement):
     script.type = 'text/javascript';
     target.appendChild(script);
 }
+
+export function nativeHistoryWrapper(eventType: string): () => ReturnType<typeof history['pushState']> {
+    const origin = window.top.history[eventType];
+    return function () {
+        const rev = origin.apply(this, arguments);
+        const event = new Event(eventType);
+        // @ts-ignore
+        event.args = arguments;
+        window.dispatchEvent(event);
+        return rev;
+    }
+}
