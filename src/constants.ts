@@ -38,3 +38,7 @@ export const symbolKindNames = {
 }
 
 export const quotesReg = /^\'|"|\'|"$/g;
+
+export const AGENT = 'AGENT';
+export const AGENTCONNECTION = 'AGENT-CONNECTION';
+

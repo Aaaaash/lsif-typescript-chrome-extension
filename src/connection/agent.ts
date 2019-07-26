@@ -1,4 +1,5 @@
 import { logger } from '../logger';
+import { AGENT } from '../constants';
 
 export class Agent {
     private messageSource: MessageEventSource;
@@ -8,7 +9,7 @@ export class Agent {
     constructor(private messagePort: chrome.runtime.Port) {}
 
     private injectMessageHandler = (message: MessageEvent): void => {
-        if (message.data.source && message.data.source === 'content-agent') {
+        if (message.data.source && message.data.source === AGENT) {
             return;
         }
         
@@ -29,7 +30,7 @@ export class Agent {
 
     private backgroundMesageHandler = (message): void => {
         // @ts-ignore
-        this.messageSource.postMessage({ ...message, source: 'content-agent' }, this.messageOrigin);
+        this.messageSource.postMessage({ ...message, source: AGENT }, this.messageOrigin);
     }
 
     public forward(): void {

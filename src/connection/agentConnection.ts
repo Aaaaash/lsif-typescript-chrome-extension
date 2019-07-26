@@ -1,4 +1,5 @@
 import { NormalEventType, PostMessageEventType, ServerConnectStatus } from '../types';
+import { AGENTCONNECTION } from '../constants';
 
 export class AgentConnection {
     
@@ -15,7 +16,7 @@ export class AgentConnection {
     }
 
     private postMessageHandler = (message: MessageEvent): void => {
-        if (message.data.source && message.data.source === 'agent-connection') {
+        if (message.data.source && message.data.source === AGENTCONNECTION) {
             return;
         }
 
@@ -72,7 +73,7 @@ export class AgentConnection {
     }
 
     private postMesasge(message): void {
-        window.postMessage({ ...message, source: 'agent-connection' }, '*');
+        window.postMessage({ ...message, source: AGENTCONNECTION }, '*');
     }
 
     public dispose(): void {

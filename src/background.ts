@@ -28,7 +28,6 @@ const onOpen = (): void => {
 websocket.addEventListener('open', onOpen); 
 
 chrome.extension.onRequest.addListener((request, sender, sendResponse) => {
-    console.log(request);
     switch (request.event) {
         case PostMessageEventType.reconnect: {
             logger.debug('Reconnecting');
