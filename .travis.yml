@@ -11,8 +11,10 @@ node_js:
 
 install:
   - yarn install
+  - apt-get install unzip
 
 script:
   - yarn run lint
   - yarn run build
-  - yarn run pack
+  - yarn run pack:web-ext
+  - yarn run pack:chrome-crx

@@ -1,4 +1,3 @@
-const ChromeExtensionReloader = require('webpack-chrome-extension-reloader');
 const { DefinePlugin } = require('webpack');
 const path = require('path');
 
@@ -13,7 +12,6 @@ module.exports = {
         path: path.join(__dirname, 'out'),
         filename: '[name].js'
     },
-    devtool: 'source-map',
     mode: 'development',
     module: {
         rules: [
