@@ -6,6 +6,7 @@
   "scripts": {
     "compile": "tsc -p .",
     "build": "rm -rf out && webpack --config ./webpack.config.js --mode=production --progress",
+    "pack": "./node_modules/.bin/crx -o lsif-typescript.crx",
     "start": "webpack --config ./webpack.config.js --mode=development --progress --watch",
     "lint": "./node_modules/.bin/eslint --ext .ts ./ --ignore-pattern ./.eslintignore",
     "lint:fix": "./node_modules/.bin/eslint --ext .ts ./ --ignore-pattern ./.eslintignore --fix"
@@ -13,6 +14,7 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "1.11.0",
     "@typescript-eslint/parser": "1.11.0",
+    "crx": "^5.0.1",
     "css-loader": "^3.0.0",
     "eslint": "6.0.1",
     "eslint-plugin-typescript": "0.14.0",
