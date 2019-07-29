@@ -21,4 +21,5 @@
 - ~~支持 gotoDefinition (有限的)~~
 - 支持 findReferences
 - ~~支持 CODING interprise (有限的)~~
-- DOM 性能优化
+- Options 页面, 允许启用或关闭部分特性
+- DOM 操作性能优化
