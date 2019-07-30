@@ -1,6 +1,8 @@
 const { DefinePlugin } = require('webpack');
 const path = require('path');
 
+const production = process.env.NODE_ENV === 'production';
+
 module.exports = {
     entry: {
         content: path.join(__dirname, 'src/content.ts'),
@@ -12,6 +14,7 @@ module.exports = {
         path: path.join(__dirname, 'out'),
         filename: '[name].js'
     },
+    devtool: production ? null : 'source-map',
     mode: 'development',
     module: {
         rules: [
