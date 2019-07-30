@@ -14,7 +14,7 @@ module.exports = {
         path: path.join(__dirname, 'out'),
         filename: '[name].js'
     },
-    devtool: production ? null : 'source-map',
+    devtool: production ? false : 'source-map',
     mode: 'development',
     module: {
         rules: [

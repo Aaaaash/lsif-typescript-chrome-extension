@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "compile": "tsc -p .",
-    "build": "rm -rf out && webpack --config ./webpack.config.js --mode=production --progress",
+    "build": "rm -rf out && NODE_ENV=production webpack --config ./webpack.config.js --mode=production --progress",
     "start": "webpack --config ./webpack.config.js --mode=development --progress --watch",
     "pack:web-ext": "./node_modules/.bin/web-ext build --artifacts-dir .",
     "pack:chrome-crx": "mkdir dist && cd dist/ && unzip ../lsif_typescript-0.0.1.zip && ../node_modules/.bin/crx pack -o lsif-typescript.crx",
