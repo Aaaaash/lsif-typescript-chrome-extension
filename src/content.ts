@@ -3,13 +3,13 @@ import { logger, field } from './logger';
 import { AgentConnection } from './connection';
 import { CodeHost } from './codeHost';
 import { ServerConnectStatus, RepoType, ExtensionStorage } from './types';
-import { getStorage } from './storage';
+import { getExtensionStorage } from './storage';
 
 import './style/main.css';
 
 logger.info('Start Extensions.');
 
-getStorage<ExtensionStorage>()
+getExtensionStorage<ExtensionStorage>()
     .then((res) => {
         if (res.enableExtension) {
             const wrappedPushState = nativeHistoryWrapper('pushState');

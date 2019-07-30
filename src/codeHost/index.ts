@@ -19,7 +19,7 @@ import { InitializeArguments, InitializeResponse, InitializeFaliedResponse, Docu
 import { Disposable, RepoType, ExtensionStorage } from '../types';
 import { symbolKindNames, quotesReg } from '../constants';
 import '../style/symbol-icons.css';
-import { getStorage } from '../storage';
+import { getExtensionStorage } from '../storage';
 
 marked.setOptions({
     highlight: (code: string, lang: string) => hljs.highlight(lang, code).value,
@@ -157,7 +157,7 @@ export class CodeHost {
         if(initResult.initialized) {
             this.commit = initResult.commit;
 
-            const extConfigStorage = await getStorage<ExtensionStorage>();
+            const extConfigStorage = await getExtensionStorage<ExtensionStorage>();
 
             if (extConfigStorage.enableDocumentSymbol) {
                 await this.documentSymbols(githubUrl);
@@ -351,7 +351,7 @@ export class CodeHost {
                         targetNode.classList.add('lsif-ts-ext-highlight-target');
                         targetNode.appendChild(hoverActionElement);
 
-                        const extConfigStorage = await getStorage<ExtensionStorage>();
+                        const extConfigStorage = await getExtensionStorage<ExtensionStorage>();
                         if (extConfigStorage.enableGotoDefinition) {
                             const clickHandler = (): void => {
                                 this.handleTargetNodeClick(position);

@@ -1,6 +1,6 @@
 import { injectContentScript } from './utils';
 import { Agent } from './connection';
-import { TypeScriptExtensionsChannel } from './constants';
+import { TypeScriptExtensionsChannel, storageName } from './constants';
 
 function injectScript(): void {
     const contentScript = chrome.runtime.getURL('out/content.js');
@@ -14,3 +14,10 @@ function injectScript(): void {
 }
 
 injectScript();
+
+// console.log(chrome.storage);
+// chrome.storage.sync.get(storageName, (storage) => {
+//     if (storage[storageName]) {
+//         // console.l
+//     }
+// });
