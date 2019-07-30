@@ -16,9 +16,10 @@ import {
 import { logger, field } from '../logger';
 import { AgentConnection } from '../connection';
 import { InitializeArguments, InitializeResponse, InitializeFaliedResponse, DocumentSymbolArguments } from '../protocol';
-import { Disposable, RepoType } from '../types';
+import { Disposable, RepoType, ExtensionStorage } from '../types';
 import { symbolKindNames, quotesReg } from '../constants';
 import '../style/symbol-icons.css';
+import { getStorage } from '../storage';
 
 marked.setOptions({
     highlight: (code: string, lang: string) => hljs.highlight(lang, code).value,
@@ -51,7 +52,7 @@ export class CodeHost {
     private repository: string;
 
     constructor(private connection: AgentConnection, private repoType: RepoType) {
-        window.addEventListener('pushState', this.dispose);        
+        window.addEventListener('pushState', this.dispose);
     }
 
     public start(gitUrl: RepoUrlType): void {
@@ -156,25 +157,31 @@ export class CodeHost {
         if(initResult.initialized) {
             this.commit = initResult.commit;
 
-            await this.documentSymbols(githubUrl);
+            const extConfigStorage = await getStorage<ExtensionStorage>();
+
+            if (extConfigStorage.enableDocumentSymbol) {
+                await this.documentSymbols(githubUrl);
+            }
 
             if (this.repoType === RepoType.github) {
-                // Find all code cells from vode view.
-                const codeView = document.querySelector('table');
-                const isCodeView = checkIsCodeView(codeView);
-    
-                if (isCodeView) {
-                    logger.info('Fill code cells');
-                    fillTextNodeForCodeCell(codeView);
-    
-                    this.codeView = codeView;
-                    const debouncedHoverAction = debounce(this.hoverAction, 250);
-                    this.codeView.addEventListener('mousemove', debouncedHoverAction);
-                    this.disposes.push({
-                        dispose: () => {
-                            this.codeView.removeEventListener('mousemove', debouncedHoverAction);
-                        },
-                    });
+                if (extConfigStorage.enableHoverAction) {
+                    // Find all code cells from vode view.
+                    const codeView = document.querySelector('table');
+                    const isCodeView = checkIsCodeView(codeView);
+        
+                    if (isCodeView) {
+                        logger.info('Fill code cells');
+                        fillTextNodeForCodeCell(codeView);
+        
+                        this.codeView = codeView;
+                        const debouncedHoverAction = debounce(this.hoverAction, 250);
+                        this.codeView.addEventListener('mousemove', debouncedHoverAction);
+                        this.disposes.push({
+                            dispose: () => {
+                                this.codeView.removeEventListener('mousemove', debouncedHoverAction);
+                            },
+                        });
+                    }
                 }
             }
         }
@@ -344,19 +351,26 @@ export class CodeHost {
                         targetNode.classList.add('lsif-ts-ext-highlight-target');
                         targetNode.appendChild(hoverActionElement);
 
-                        const clickHandler = (): void => {
-                            this.handleTargetNodeClick(position);
-                            targetNode.removeEventListener('click', clickHandler);
-                        };
+                        const extConfigStorage = await getStorage<ExtensionStorage>();
+                        if (extConfigStorage.enableGotoDefinition) {
+                            const clickHandler = (): void => {
+                                this.handleTargetNodeClick(position);
+                                targetNode.removeEventListener('click', clickHandler);
+                            };
+                            targetNode.addEventListener('click', clickHandler);
 
-                        targetNode.addEventListener('click', clickHandler);
+                            this.disposes.push({
+                                dispose: () => {
+                                    targetNode.removeEventListener('click', clickHandler);
+                                }
+                            });
+                        }
 
                         const clearActionNode = (): void => {
                             targetNode.removeChild(hoverActionElement);
                             targetNode.classList.remove('lsif-ts-ext-highlight-target');
                             targetNode.classList.remove('lsif-ts-ext-underline-target');
                             targetNode.removeEventListener('mouseleave', clearActionNode);
-                            targetNode.removeEventListener('click', clickHandler);
                         };
                         targetNode.addEventListener('mouseleave', clearActionNode);
 

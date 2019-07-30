@@ -1,3 +1,5 @@
+import { defaultStorageConfig } from './constants';
+
 export enum ServerConnectStatus {
     connecting = 'CONNECTING',
     connected = 'CONNECTED',
@@ -35,3 +37,5 @@ export enum RepoType {
     github = 'GitHub',
     coding = 'CODING Enterprise', // CODING Enterprise.
 };
+
+export type ExtensionStorage = typeof defaultStorageConfig;

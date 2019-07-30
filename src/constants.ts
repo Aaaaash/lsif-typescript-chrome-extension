@@ -42,3 +42,13 @@ export const quotesReg = /^\'|"|\'|"$/g;
 export const AGENT = 'AGENT';
 export const AGENTCONNECTION = 'AGENT-CONNECTION';
 
+export const storageName = 'LSIF-TYPESCRIPT-EXTENSION-STORAGE';
+
+export const defaultStorageConfig = {
+    enableExtension: true,
+    enableCodingEnterprise: true,
+    enableGitHub: true,
+    enableDocumentSymbol: true,
+    enableHoverAction: true,
+    enableGotoDefinition: true,
+}

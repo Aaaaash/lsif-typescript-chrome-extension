@@ -42,6 +42,7 @@
     "notifications",
     "webRequest",
     "webRequestBlocking",
+    "storage",
     "http://*/*",
     "https://*/*"
   ]
