@@ -55,7 +55,11 @@ export class CodeHost {
 
     private repository: string;
 
-    constructor(private connection: AgentConnection, private repoType: RepoType) {
+    constructor(
+        private connection: AgentConnection,
+        private repoType: RepoType,
+        private storage: ExtensionStorage,
+    ) {
         window.addEventListener('pushState', this.dispose);
     }
 
@@ -108,7 +112,8 @@ export class CodeHost {
         }
     }
 
-    private prepareBlobJumpUrl(domain: string, owner: string, project: string, line: number | string, filePath: string): string {
+    private getBlobJumpUrl(domain: string, owner: string, project: string, line: number | string, filePath: string): string {
+        logger.debug(`to ${line}`);
         switch(this.repoType) {
             case RepoType.github:
                 return `https:\/\/${domain}\/${owner}\/${project}\/blob\/${this.tagOrCommit}\/${filePath}#L${line}`;
@@ -140,14 +145,12 @@ export class CodeHost {
         if(initResult.initialized) {
             this.commit = initResult.commit;
 
-            const extConfigStorage = await getExtensionStorage<ExtensionStorage>();
-
-            if (extConfigStorage.enableDocumentSymbol) {
+            if (this.storage.enableDocumentSymbol) {
                 await this.documentSymbols(githubUrl);
             }
 
-            if (this.repoType === RepoType.github) {
-                if (extConfigStorage.enableHoverAction) {
+            if (this.storage.enableHoverAction) {
+                if (this.repoType === RepoType.github) {
                     // Find all code cells from vode view.
                     const codeView = document.querySelector('table');
                     const isCodeView = checkIsCodeView(codeView);
@@ -177,7 +180,7 @@ export class CodeHost {
             }
             if (ev.target !== parent && ev.target.dataset['symbolLink']) {
                 const { domain, owner, project, line } = ev.target.dataset;
-                window.location.href = this.prepareBlobJumpUrl(domain, owner, project, line, this.relativePath);
+                window.location.href = this.getBlobJumpUrl(domain, owner, project, Number(line) + 1, this.relativePath);
             } else if (ev.target && ev.target.dataset['lineSymbol'] && ev.target.dataset['expanded']) {
                 const { lineSymbol, expanded } = ev.target.dataset;
                 const [ symbolName, line ] = lineSymbol.split(':');
@@ -281,7 +284,7 @@ export class CodeHost {
 
             if (!uri.startsWith('file://')) {
                 const { domain, owner, project } = this.blobDetail;
-                const href = this.prepareBlobJumpUrl(domain, owner, project, range.start.line + 1, uri);
+                const href = this.getBlobJumpUrl(domain, owner, project, range.start.line + 1, uri);
                 window.location.href = href;
             } else {
                 logger.warn(`Can not jump to file ${uri}`);
@@ -334,8 +337,7 @@ export class CodeHost {
                         targetNode.classList.add('lsif-ts-ext-highlight-target');
                         targetNode.appendChild(hoverActionElement);
 
-                        const extConfigStorage = await getExtensionStorage<ExtensionStorage>();
-                        if (extConfigStorage.enableGotoDefinition) {
+                        if (this.storage.enableGotoDefinition) {
                             const clickHandler = (): void => {
                                 this.handleTargetNodeClick(position);
                                 targetNode.removeEventListener('click', clickHandler);

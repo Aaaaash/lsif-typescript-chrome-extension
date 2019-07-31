@@ -38,7 +38,7 @@ export class Agent {
     }
 
     public forward(): void {
-        logger.info('Forward message between injected script and background script.');
+        logger.info('Forwarding message between injected script and background script.');
         window.addEventListener('message', this.injectMessageHandler);
         this.messagePort.onMessage.addListener(this.backgroundMesageHandler);
     }

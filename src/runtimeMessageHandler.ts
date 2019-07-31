@@ -1,6 +1,7 @@
 import { Connection } from './connection';
 import { logger, field } from './logger';
 import { TypeScriptExtensionsChannel } from './constants';
+import { getExtensionStorage } from './storage';
 import { PostMessageEventType, NormalEventType, ServerConnectStatus } from './types';
 
 export function runtimeMessageHandler(
@@ -25,6 +26,16 @@ export function runtimeMessageHandler(
                             data: {
                                 eventType: NormalEventType.checkConnect,
                                 result: connectStatusGetter(),
+                            },
+                        });
+                        break;
+                    case NormalEventType.getStorage:
+                        const storage = await getExtensionStorage();
+                        messagePort.postMessage({
+                            event: PostMessageEventType.normalEvent,
+                            data: {
+                                eventType: NormalEventType.getStorage,
+                                result: storage,
                             },
                         });
                         break;

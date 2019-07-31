@@ -22,6 +22,7 @@ export interface ExtensionWindow extends Window {
 
 export enum NormalEventType {
     checkConnect = 'CHECK_CONNECT',
+    getStorage = 'GET_EXTENSION_STORAGE',
 };
 
 export enum PostMessageEventType {

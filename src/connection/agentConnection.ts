@@ -1,4 +1,4 @@
-import { NormalEventType, PostMessageEventType, ServerConnectStatus } from '../types';
+import { NormalEventType, PostMessageEventType, ServerConnectStatus, ExtensionStorage } from '../types';
 import { AGENTCONNECTION } from '../constants';
 
 export class AgentConnection {
@@ -38,6 +38,7 @@ export class AgentConnection {
         }
     }
 
+    // To Background via agent.
     public sendRequest<T, R>(method: string, message: T): Promise<R> {
         const id = this.req += 1;
         return new Promise((resolve, reject) => {
@@ -57,19 +58,28 @@ export class AgentConnection {
         });
     }
 
-    public checkConnect(): Promise<ServerConnectStatus> {
+    // To Agent
+    public sendNormalRequest<R>(eventType: NormalEventType): Promise<R> {
         return new Promise((resolve, reject) => {
             this.postMesasge({
                 event: PostMessageEventType.normalEvent,
                 data: {
-                    eventType: NormalEventType.checkConnect,
+                    eventType,
                 },
             });
 
-            this.rpcEventCallbacks.set(NormalEventType.checkConnect, (response) => {
+            this.rpcEventCallbacks.set(eventType, (response) => {
                 resolve(response);
             });
         });
+    }
+
+    public checkConnect(): Promise<ServerConnectStatus> {
+        return this.sendNormalRequest<ServerConnectStatus>(NormalEventType.checkConnect);
+    }
+
+    public getExtensionStorage(): Promise<ExtensionStorage> {
+        return this.sendNormalRequest<ExtensionStorage>(NormalEventType.getStorage);
     }
 
     private postMesasge(message): void {
