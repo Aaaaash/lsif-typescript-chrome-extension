@@ -14,11 +14,3 @@ function injectScript(): void {
 }
 
 injectScript();
-
-// console.log(chrome.storage);
-chrome.storage.sync.get(storageName, (storage) => {
-    console.log(storage);
-    if (storage[storageName]) {
-        // console.l
-    }
-});
