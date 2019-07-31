@@ -1,14 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>LSIF TypeScript</title>
+    <link href="../styles/normalize.css" rel="stylesheet" />
+    <link href="../styles/blueprint.css" rel="stylesheet" />
 </head>
+
+<style>
+    .container {
+        padding: 15px;
+    }
+</style>
+
 <body>
-    <div class="options-container">
-        hello lsif.
-    </div>
+    <div class="container">
+        <div class="main-body bp3-form-group .modifier">
+            <label class="bp3-label" for="form-group-input">
+                启用/禁用部分特性
+                <span class="bp3-text-muted">(默认启用全部)</span>
+            </label>
+            <div class="bp3-form-content">
+                <label class="bp3-control bp3-checkbox .modifier">
+                    <input class="coding-checkbox" data-type="MergeRequestBean" type="checkbox" :modifier />
+                    <span class="bp3-control-indicator"></span>
+                    禁用所有特性
+                </label>
+                <div class="divider bp3-menu-divider"></div>
+                <label class="bp3-control bp3-checkbox .modifier">
+                    <input class="coding-checkbox" data-type="Mission" type="checkbox" :modifier />
+                    <span class="bp3-control-indicator"></span>
+                    CODING 企业版(有限)
+                </label>
+                <label class="bp3-control bp3-checkbox .modifier">
+                    <input class="coding-checkbox" data-type="ProjectTweet" type="checkbox" :modifier />
+                    <span class="bp3-control-indicator"></span>
+                    GitHub
+                </label>
+                <label class="bp3-control bp3-checkbox .modifier">
+                    <input class="coding-checkbox" data-type="CommitLineNote" type="checkbox" :modifier />
+                    <span class="bp3-control-indicator"></span>
+                    符号跳转
+                </label>
+                <label class="bp3-control bp3-checkbox .modifier">
+                    <input class="coding-checkbox" data-type="TaskComment" type="checkbox" :modifier />
+                    <span class="bp3-control-indicator"></span>
+                    Hover 显示详情
+                </label>
+                <label class="bp3-control bp3-checkbox .modifier">
+                    <input class="coding-checkbox" data-type="CiBuild" type="checkbox" :modifier />
+                    <span class="bp3-control-indicator"></span>
+                    跳转到定义
+                </label>
+            </div>
+        </div>
 </body>
+
 </html>

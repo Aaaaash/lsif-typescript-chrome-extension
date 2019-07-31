@@ -23,11 +23,8 @@ import { InitializeArguments, InitializeResponse, InitializeFaliedResponse, Docu
 import { Disposable, RepoType, ExtensionStorage } from '../types';
 import { symbolKindNames, quotesReg } from '../constants';
 import '../style/symbol-icons.css';
-import { getExtensionStorage } from '../storage';
 
-marked.setOptions({
-    highlight: (code: string, lang: string) => hljs.highlight(lang, code).value,
-});
+marked.setOptions({ highlight: (code: string, lang: string) => hljs.highlight(lang, code).value });
 
 type RepoUrlType = ReturnType<typeof parseRepoURL>;
 
@@ -180,7 +177,7 @@ export class CodeHost {
             }
             if (ev.target !== parent && ev.target.dataset['symbolLink']) {
                 const { domain, owner, project, line } = ev.target.dataset;
-                window.location.href = this.getBlobJumpUrl(domain, owner, project, Number(line) + 1, this.relativePath);
+                window.location.href = this.getBlobJumpUrl(domain, owner, project, line, this.relativePath);
             } else if (ev.target && ev.target.dataset['lineSymbol'] && ev.target.dataset['expanded']) {
                 const { lineSymbol, expanded } = ev.target.dataset;
                 const [ symbolName, line ] = lineSymbol.split(':');
