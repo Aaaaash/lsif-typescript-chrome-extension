@@ -45,10 +45,10 @@ export const AGENTCONNECTION = 'AGENT-CONNECTION';
 export const storageName = 'LSIF-TYPESCRIPT-EXTENSION-STORAGE';
 
 export const defaultStorageConfig = {
-    enableExtension: true,
-    enableCodingEnterprise: true,
-    enableGitHub: true,
-    enableDocumentSymbol: true,
-    enableHoverAction: true,
-    enableGotoDefinition: true,
+    enable: true,
+    codingEnterprise: true,
+    gitHub: true,
+    documentSymbol: true,
+    hoverAction: true,
+    gotoDefinition: true,
 }

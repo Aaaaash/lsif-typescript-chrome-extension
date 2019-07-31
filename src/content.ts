@@ -26,7 +26,7 @@ const startupWithBlobPage = async (githubUrl, repoType: RepoType): Promise<void>
     const agent = new AgentConnection();
 
     const extensionStorage = await agent.getExtensionStorage();
-    if (extensionStorage.enableExtension) {
+    if (extensionStorage.enable) {
         const connectStatus = await agent.checkConnect();
         logger.debug(`Check connect ${connectStatus}`);
         if (connectStatus === ServerConnectStatus.connected) {

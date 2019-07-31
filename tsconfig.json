@@ -14,5 +14,8 @@
     ],
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true
-  }
+  },
+  "exclude": [
+    "dist"
+  ]
 }

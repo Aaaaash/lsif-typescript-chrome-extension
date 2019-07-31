@@ -142,11 +142,11 @@ export class CodeHost {
         if(initResult.initialized) {
             this.commit = initResult.commit;
 
-            if (this.storage.enableDocumentSymbol) {
+            if (this.storage.documentSymbol) {
                 await this.documentSymbols(githubUrl);
             }
 
-            if (this.storage.enableHoverAction) {
+            if (this.storage.hoverAction) {
                 if (this.repoType === RepoType.github) {
                     // Find all code cells from vode view.
                     const codeView = document.querySelector('table');
@@ -334,7 +334,7 @@ export class CodeHost {
                         targetNode.classList.add('lsif-ts-ext-highlight-target');
                         targetNode.appendChild(hoverActionElement);
 
-                        if (this.storage.enableGotoDefinition) {
+                        if (this.storage.gotoDefinition) {
                             const clickHandler = (): void => {
                                 this.handleTargetNodeClick(position);
                                 targetNode.removeEventListener('click', clickHandler);
