@@ -149,3 +149,46 @@ export function nativeHistoryWrapper(eventType: string): () => ReturnType<typeof
         return rev;
     }
 }
+
+interface GitDomainOwnerAndProject {
+    domain: string;
+    owner: string;
+    project: string;
+}
+
+export function getGitHubDomainOwnerAndProject(rawRepoName: string): GitDomainOwnerAndProject {
+    const [ domain, owner, project ] = rawRepoName.split('/');
+    return {
+        domain,
+        owner,
+        project,
+    };
+}
+
+export function getGitHubCloneUrl(rawRepoName: string): string {
+    const { domain, owner, project } = getGitHubDomainOwnerAndProject(rawRepoName);
+    const cloneUrl = `git@${domain}:${owner}/${project}`;
+    return cloneUrl;
+}
+
+interface CodingOwnerAndProject {
+    domain: string;
+    owner: string;
+    project: string;
+}
+
+export function getCodingDomainOwnerAndProject(rawRepoName: string): GitDomainOwnerAndProject {
+    const [ domain, project ] = rawRepoName.split('/');
+    const [ owner ] = domain.split('.');
+    return {
+        domain,
+        owner,
+        project,
+    };
+}
+
+export function getCodingCloneUrl(rawRepoName: string): string {
+    const { owner, project } = getCodingDomainOwnerAndProject(rawRepoName);
+    const cloneUrl = `git@e.coding.net:${owner}/${project}`;
+    return cloneUrl;
+}

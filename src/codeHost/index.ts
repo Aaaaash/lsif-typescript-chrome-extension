@@ -12,6 +12,10 @@ import {
     parseRepoURL,
     checkIsCodeView,
     fillTextNodeForCodeCell,
+    getCodingDomainOwnerAndProject,
+    getGitHubDomainOwnerAndProject,
+    getCodingCloneUrl,
+    getGitHubCloneUrl,
 } from '../utils';
 import { logger, field } from '../logger';
 import { AgentConnection } from '../connection';
@@ -76,15 +80,10 @@ export class CodeHost {
     private prepareCloneUrl(gitUrl: RepoUrlType): string | undefined {
         switch(this.repoType) {
             case RepoType.github: {
-                const [ domain, owner, project ] = gitUrl.rawRepoName.split('/');
-                const cloneUrl = `git@${domain}:${owner}/${project}`;
-                return cloneUrl;
+                return getGitHubCloneUrl(gitUrl.rawRepoName);
             }
             case RepoType.coding: {
-                const [ ownerDomain, project ] = gitUrl.rawRepoName.split('/');
-                const [ ownerName ] = ownerDomain.split('.');
-                const cloneUrl = `git@e.coding.net:${ownerName}/${project}`;
-                return cloneUrl;
+                return getCodingCloneUrl(gitUrl.rawRepoName);
             }
             default:
                 return undefined;
@@ -94,12 +93,10 @@ export class CodeHost {
     private prapreBlobDetail(gitUrl: RepoUrlType): BlobDetail {
         switch(this.repoType) {
             case RepoType.github: {
-                const [ domain, owner, project ] = gitUrl.rawRepoName.split('/');
-                return { domain, owner, project };
+                return getGitHubDomainOwnerAndProject(gitUrl.rawRepoName);
             }
             case RepoType.coding: {
-                const [ domain, project ] = gitUrl.rawRepoName.split('/');
-                const [ owner ] = domain.split('/');
+                const { domain, owner, project } = getCodingDomainOwnerAndProject(gitUrl.rawRepoName);
                 return {
                     domain,
                     owner,
@@ -108,20 +105,6 @@ export class CodeHost {
             }
             default:
                 return undefined;
-        }
-    }
-
-    private prepareProjectName(gitUrl: RepoUrlType): string {
-        switch (this.repoType) {
-            case RepoType.github: 
-                return gitUrl.rawRepoName;
-            case RepoType.coding: {
-                const [ domain, project ] = gitUrl.rawRepoName.split('/');
-                const [ domainName ] = domain.split('.');
-                return `${domainName}/${project}`;
-            }
-            default:
-                return gitUrl.rawRepoName;
         }
     }
 
