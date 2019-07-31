@@ -1,6 +1,6 @@
 import { injectContentScript } from './utils';
 import { Agent } from './connection';
-import { TypeScriptExtensionsChannel, storageName } from './constants';
+import { TypeScriptExtensionsChannel } from './constants';
 
 function injectScript(): void {
     const contentScript = chrome.runtime.getURL('out/content.js');
