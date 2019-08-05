@@ -5,14 +5,13 @@ async function startup(): Promise<void> {
     const disposes = Object.keys(storage).map((configKey: string) => {
         const element: HTMLInputElement = document.querySelector(`.${configKey}`);        
         if (element) {
-            console.log(`Key: ${configKey}, Value: ${storage[configKey]}`);
             element.checked = storage[configKey];
             const changeHandler = async (e: MouseEvent): Promise<void> => {
-                console.log(`Update -> ${(e.target as HTMLInputElement).checked}`);
-                await updateExtensionStorage({
+                const newConfig = {
                     ...storage,
                     [configKey]: (e.target as HTMLInputElement).checked,
-                });
+                };
+                await updateExtensionStorage(newConfig);
             }
             element.addEventListener('change', changeHandler);
             return () => {
