@@ -52,7 +52,6 @@ if (repoType) {
 
     if (githubUrl) {
         logger.info(`${repoType} Repository.`, field('repo', githubUrl));
-
         switch (githubUrl.pageType) {
             // Only enable in blob page for now.
             case 'blob':

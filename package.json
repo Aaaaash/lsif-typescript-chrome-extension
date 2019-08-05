@@ -7,8 +7,8 @@
     "compile": "tsc -p .",
     "build": "rm -rf out && NODE_ENV=production webpack --config ./webpack.config.js --mode=production --progress",
     "start": "webpack --config ./webpack.config.js --mode=development --progress --watch",
-    "pack:web-ext": "./node_modules/.bin/web-ext build --artifacts-dir .",
-    "pack:chrome-crx": "mkdir dist && cd dist/ && unzip ../lsif_typescript-0.0.1.zip && ../node_modules/.bin/crx pack -o lsif-typescript.crx",
+    "pack:web-ext": "rm -rf *.zip && ./node_modules/.bin/web-ext build --artifacts-dir .",
+    "pack:chrome-crx": "rm -rf dist/ && mkdir dist && cd dist/ && unzip ../lsif_typescript-0.0.1.zip && ../node_modules/.bin/crx pack -o lsif-typescript.crx",
     "lint": "./node_modules/.bin/eslint --ext .ts ./ --ignore-pattern ./.eslintignore",
     "lint:fix": "./node_modules/.bin/eslint --ext .ts ./ --ignore-pattern ./.eslintignore --fix"
   },
