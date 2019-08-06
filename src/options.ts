@@ -8,7 +8,6 @@ async function startup(): Promise<void> {
             element.checked = storage[configKey];
             const changeHandler = async (e: MouseEvent): Promise<void> => {
                 const newConfig = {
-                    ...storage,
                     [configKey]: (e.target as HTMLInputElement).checked,
                 };
                 await updateExtensionStorage(newConfig);

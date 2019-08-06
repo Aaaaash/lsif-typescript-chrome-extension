@@ -26,8 +26,11 @@ export function getExtensionStorage(): Promise<ExtensionStorage> {
     });
 }
 
-export function updateExtensionStorage(extensionStorage: ExtensionStorage): Promise<void> {
+export function updateExtensionStorage(newStorage: { [prop: string]: boolean }): Promise<void> {
     return new Promise((resolve, reject) => {
-        chrome.storage.sync.set(extensionStorage, resolve);
+        return getExtensionStorage()
+            .then((storage) => {
+                chrome.storage.sync.set({...storage, ...newStorage}, resolve);
+            });
     });
 }
