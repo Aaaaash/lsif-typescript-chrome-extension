@@ -30,7 +30,9 @@ export function updateExtensionStorage(newStorage: { [prop: string]: boolean }):
     return new Promise((resolve, reject) => {
         return getExtensionStorage()
             .then((storage) => {
-                chrome.storage.sync.set({...storage, ...newStorage}, resolve);
+                chrome.storage.sync.set({
+                    [storageName]: {...storage, ...newStorage}
+                }, resolve);
             });
     });
 }
