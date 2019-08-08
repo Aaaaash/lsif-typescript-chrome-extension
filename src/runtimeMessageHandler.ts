@@ -16,7 +16,6 @@ export function runtimeMessageHandler(
     logger.debug('Sender', field('info', { url, id, tab: tab.id }));
 
     messagePort.onMessage.addListener(async (message) => {
-        logger.debug(message);
         switch(message.event) {
             case PostMessageEventType.normalEvent:
                 switch(message.data.eventType) {
