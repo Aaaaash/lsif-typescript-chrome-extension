@@ -2,7 +2,7 @@ import { SymbolKind } from 'vscode-languageserver-types';
 
 export const TypeScriptExtensionsChannel = 'lsif-typescript-channel';
 
-export const wsAddress = 'ws://localhost:8088';
+export const wsAddress = global.process.env.SERVER_URL;
 
 export const githubCodeViewSelector = 'js-file-line-container';
 

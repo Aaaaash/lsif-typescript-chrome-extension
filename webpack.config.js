@@ -1,7 +1,12 @@
-const { DefinePlugin } = require('webpack');
 const path = require('path');
+const WebpackBarPlugin = require('webpackbar');
+const { DefinePlugin } = require('webpack');
 
 const production = process.env.NODE_ENV === 'production';
+
+if (!production) {
+    require('dotenv').config();
+}
 
 module.exports = {
     entry: {
@@ -51,6 +56,11 @@ module.exports = {
     plugins: [
         new DefinePlugin({
             'global.process.env.LOG_LEVEL': '"debug"',
-        })
+            'global.process.env.SERVER_URL': JSON.stringify(process.env['SERVER_URL']),
+        }),
+        new WebpackBarPlugin({
+            name: 'LSIF TypeScript',
+            color: 'green',
+        }),
     ]
 };
