@@ -6,3 +6,4 @@ dist
 *.zip
 *.pem
 *.crx
+.env
