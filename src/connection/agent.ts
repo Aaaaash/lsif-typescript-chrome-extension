@@ -1,5 +1,5 @@
 import { logger } from '../logger';
-import { AGENT } from '../constants';
+import { CONNECTION_TYPE } from '../constants';
 
 export class Agent {
     private messageSource: MessageEventSource;
@@ -13,7 +13,7 @@ export class Agent {
     }
 
     private injectMessageHandler = (message: MessageEvent): void => {
-        if (message.data.source && message.data.source === AGENT) {
+        if (message.data.source && message.data.source === CONNECTION_TYPE.agent) {
             return;
         }
         
@@ -34,7 +34,7 @@ export class Agent {
 
     private backgroundMesageHandler = (message): void => {
         // @ts-ignore
-        this.messageSource.postMessage({ ...message, source: AGENT }, this.messageOrigin);
+        this.messageSource.postMessage({ ...message, source: CONNECTION_TYPE.agent }, this.messageOrigin);
     }
 
     public forward(): void {

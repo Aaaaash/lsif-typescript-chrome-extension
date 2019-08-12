@@ -39,8 +39,10 @@ export const symbolKindNames = {
 
 export const quotesReg = /^\'|"|\'|"$/g;
 
-export const AGENT = 'AGENT';
-export const AGENTCONNECTION = 'AGENT-CONNECTION';
+export enum CONNECTION_TYPE {
+    agent = 'AGENT',
+    agentConnection = 'AGENT-CONNECTION',
+}
 
 export const storageName = 'LSIF-TYPESCRIPT-EXTENSION-STORAGE';
 
