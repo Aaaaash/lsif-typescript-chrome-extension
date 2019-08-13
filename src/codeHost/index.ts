@@ -4,6 +4,7 @@ import * as hljs from 'highlight.js';
 import { lsp } from 'lsif-protocol';
 import { DocumentSymbol } from 'vscode-languageserver-types';
 import 'highlight.js/styles/github.css';
+import * as Mousetrap from 'mousetrap';
 
 import {
     memoizedFindCodeCellFromContainer,
@@ -16,6 +17,7 @@ import {
     getGitHubDomainOwnerAndProject,
     getCodingCloneUrl,
     getGitHubCloneUrl,
+    normalizeKeys,
 } from '../utils';
 import { logger, field } from '../logger';
 import { AgentConnection } from '../connection';
@@ -52,12 +54,27 @@ export class CodeHost {
 
     private repository: string;
 
+    private codeActionsStack: string[] = [];
+
     constructor(
         private connection: AgentConnection,
         private repoType: RepoType,
         private storage: ExtensionStorage,
     ) {
         window.addEventListener('pushState', this.dispose);
+        Mousetrap.bind(normalizeKeys('ctrl+-', '+', ' '), (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (this.codeActionsStack.length > 0) {
+                const target = this.codeActionsStack.pop();
+                window.location.href = target;
+            }
+            this.disposes.push({
+                dispose: () => {
+                    Mousetrap.unbind('ctrl+-');
+                },
+            });
+        });
     }
 
     public start(gitUrl: RepoUrlType): void {
@@ -283,6 +300,7 @@ export class CodeHost {
                 const { domain, owner, project } = this.blobDetail;
                 const href = this.getBlobJumpUrl(domain, owner, project, range.start.line + 1, uri);
                 window.location.href = href;
+                this.codeActionsStack.push(href);
             } else {
                 logger.warn(`Can not jump to file ${uri}`);
             }

@@ -1,6 +1,6 @@
 import { memoize } from 'lodash';
 
-import { githubCodeViewSelector, githubCodeCellSelector } from './constants';
+import { githubCodeViewSelector, githubCodeCellSelector, MODIFIERS_LIST, keyToKeyCode, keyCodeToKey } from './constants';
 import { Position, RepoType } from './types';
 
 export const checkIsGitHubDotCom = (): boolean => /^https?:\/\/(www.)?github.com/.test(window.location.href);
@@ -86,11 +86,11 @@ export const fillTextNodeForCodeCell = (tableElement: HTMLTableElement): void =>
 export const checkTargetIsCodeCellOrChildnodes = (target: HTMLElement, codeCells: Element[]): boolean => {
     if (
         (target.parentElement &&
-        (codeCells.includes(target.parentElement) ||
-        target.parentElement.classList.contains(githubCodeCellSelector))) ||
+            (codeCells.includes(target.parentElement) ||
+                target.parentElement.classList.contains(githubCodeCellSelector))) ||
         (target.parentElement.parentElement &&
-        codeCells.includes(target.parentElement.parentElement) ||
-        target.parentElement.parentElement.classList.contains(githubCodeCellSelector))
+            codeCells.includes(target.parentElement.parentElement) ||
+            target.parentElement.parentElement.classList.contains(githubCodeCellSelector))
     ) {
         return true;
     }
@@ -157,7 +157,7 @@ interface GitDomainOwnerAndProject {
 }
 
 export function getGitHubDomainOwnerAndProject(rawRepoName: string): GitDomainOwnerAndProject {
-    const [ domain, owner, project ] = rawRepoName.split('/');
+    const [domain, owner, project] = rawRepoName.split('/');
     return {
         domain,
         owner,
@@ -178,8 +178,8 @@ interface CodingOwnerAndProject {
 }
 
 export function getCodingDomainOwnerAndProject(rawRepoName: string): GitDomainOwnerAndProject {
-    const [ domain, project ] = rawRepoName.split('/');
-    const [ owner ] = domain.split('.');
+    const [domain, project] = rawRepoName.split('/');
+    const [owner] = domain.split('.');
     return {
         domain,
         owner,
@@ -191,4 +191,36 @@ export function getCodingCloneUrl(rawRepoName: string): string {
     const { owner, project } = getCodingDomainOwnerAndProject(rawRepoName);
     const cloneUrl = `git@e.coding.net:${owner}/${project}`;
     return cloneUrl;
+}
+
+export function keyEventToKeyCombination(e, combinator): string {
+    const modString = MODIFIERS_LIST.filter(mod => e[`${mod}Key`]).join(
+        combinator,
+    );
+    if (modString) {
+        return [modString, keyCodeToKey[e.keyCode]].join(combinator);
+    }
+    return keyCodeToKey[e.keyCode];
+}
+
+export function normalizeKeys(keys, combinator: string = '+', delimiter: string = ' '): string[] {
+    return keys
+        .toLowerCase()
+        .split(delimiter)
+        .map((keyCombo) => {
+            const keyEventObj: { [prop: string]: any } = {};
+            keyCombo.split(combinator).forEach((key) => {
+                if (key === 'cmd' || key === 'command' || key === 'super') key = 'meta';
+                if (MODIFIERS_LIST.indexOf(key) > -1) {
+                    keyEventObj[`${key}Key`] = true;
+                } else {
+                    keyEventObj.keyCode = keyToKeyCode[key];
+                }
+            });
+            if (typeof keyEventObj.keyCode !== 'number') {
+                throw Error(`Keymapper: Unrecognized key combination \`${keyCombo}\``);
+            }
+            return keyEventToKeyCombination(keyEventObj, combinator);
+        })
+        .join(delimiter);
 }
