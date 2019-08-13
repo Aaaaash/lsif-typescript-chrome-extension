@@ -194,7 +194,9 @@ export class CodeHost {
             }
             if (ev.target !== parent && ev.target.dataset['symbolLink']) {
                 const { domain, owner, project, line } = ev.target.dataset;
-                window.location.href = this.getBlobJumpUrl(domain, owner, project, line, this.relativePath);
+                const targetHref = this.getBlobJumpUrl(domain, owner, project, line, this.relativePath);
+                window.location.href = targetHref;
+                this.codeActionsStack.push(targetHref);
             } else if (ev.target && ev.target.dataset['lineSymbol'] && ev.target.dataset['expanded']) {
                 const { lineSymbol, expanded } = ev.target.dataset;
                 const [ symbolName, line ] = lineSymbol.split(':');
