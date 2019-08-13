@@ -187,6 +187,21 @@ export class CodeHost {
         }
     }
 
+    private addSymbolSearchEventListener(symbolTree: DocumentSymbol[]): Disposable {
+        const symbolSearch = document.createElement('div');
+        symbolSearch.className += 'lsif-ts-ext-symbol-search-container';
+
+        Mousetrap.bind('ctrl+shift+o', (e) => {
+            console.log('Show symbol search dialog.');
+        });
+
+        return {
+            dispose: () => {
+                Mousetrap.unbind('ctrl+shift+o');
+            },
+        };
+    }
+
     private addSymbolNavigateEventListener(parent: HTMLElement): Disposable {
         const eventHandler = (ev: Event): void => {
             if (!(ev.target instanceof HTMLElement)) {
@@ -273,6 +288,7 @@ export class CodeHost {
             documentSymbolContainer.className = 'lsif-ts-ext-textdocument-symbols-container';
             document.body.appendChild(documentSymbolContainer);
 
+            this.disposes.push(this.addSymbolSearchEventListener(documentSymbolTree));
             this.disposes.push(this.addSymbolNavigateEventListener(documentSymbolContainer));
             this.disposes.push({
                 dispose: () => {

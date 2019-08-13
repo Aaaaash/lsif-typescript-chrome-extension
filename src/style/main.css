@@ -124,3 +124,10 @@
     padding: 0px;
     margin: 0px;
 }
+
+.lsif-ts-ext-symbol-search-container {
+    width: 600px;
+    max-height: 400px;
+    background-color: #fff;
+    box-shadow: 0 0 2px solid #ccc;
+}
