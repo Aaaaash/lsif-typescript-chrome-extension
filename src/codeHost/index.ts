@@ -259,7 +259,7 @@ export class CodeHost {
     }
 
     private async documentSymbols(githubUrl: RepoUrlType): Promise<void> {
-        if (githubUrl.pageType === 'blob') {
+        if (githubUrl.pageType && githubUrl.pageType === 'blob') {
             const documentSymbolTree = await this.connection.sendRequest<DocumentSymbolArguments, lsp.DocumentSymbol[] | undefined>(
                 'documentSymbol',
                 {
