@@ -200,8 +200,15 @@ export class CodeHost {
                 const desc = createDescriptionNode(symbol.parent);
                 p.appendChild(desc);
             }
+            p.dataset['symbolInfo'] = JSON.stringify(symbol);
             return p;
         });
+    }
+
+    private makeSymbolAreaHref(symbol: DocumentSymbol): string {
+        const { range: { start, end } } = symbol;
+        const { domain, owner, project,  } = this.blobDetail;
+        return `https:\/\/${domain}\/${owner}\/${project}\/blob\/${this.tagOrCommit}\/${this.relativePath}#L${start.line + 2}#L${end.line + 2}`;
     }
 
     private addSymbolSearchEventListener(symbolTree: DocumentSymbol[]): Disposable {
@@ -226,6 +233,10 @@ export class CodeHost {
             const symbolDomList = this.makeSymbolSearchDomList(flatSymbolTree(symbolTree));
             symbolSearch.classList.add('lsif-ts-ext-symbol-search-show');
             for(const element of symbolDomList) {
+                element.addEventListener('click', () => {
+                    const symbolInfo: DocumentSymbol = JSON.parse(element.dataset['symbolInfo']);
+                    window.location.href = this.makeSymbolAreaHref(symbolInfo);
+                });
                 symbolSearchList.appendChild(element);
             }
         });

@@ -228,10 +228,10 @@ export function normalizeKeys(keys, combinator: string = '+', delimiter: string 
 
 export function flatSymbolTree(symbolTree: DocumentSymbol[], parent: string = null): FlatDocumentSymbol[] {
     return symbolTree.reduce((pre, cur) => {
+        pre.push({ ...cur, parent });
         if (cur.children && cur.children.length > 0) {
             pre = [...pre, ...flatSymbolTree(cur.children, cur.name)];
         };
-        pre.push({ ...cur, parent });
         return pre;
     }, []);
 }

@@ -138,7 +138,7 @@
     min-height: 26px;
     border: solid 1px rgba(204, 204, 204, 0.4);
     transform: translate(-50%, -20%);
-    padding: 5px 0px;
+    padding-top: 5px;
     overflow: hidden;
     align-items: center;
     flex-direction: column;
@@ -147,7 +147,6 @@
 .lsif-ts-ext-symbol-search-list {
     overflow-y: auto;
     max-height: 370px;
-    padding: 0px 5px;
     width: 100%;
 }
 
@@ -169,6 +168,14 @@
     display: flex;
     align-items: center;
     color: #666;
+    padding: 0px 5px;
+    cursor: pointer;
+    font-size: 12px;
+    user-select: none;
+}
+
+.lsif-ts-ext-symbol-search-element:hover {
+    background-color: #e8e8e8;
 }
 
 .lsif-ts-ext-symbol-description {
