@@ -1,4 +1,5 @@
 import { defaultStorageConfig } from './constants';
+import { DocumentSymbol } from 'vscode-languageserver-types';
 
 export enum ServerConnectStatus {
     connecting = 'CONNECTING',
@@ -40,3 +41,7 @@ export enum RepoType {
 };
 
 export type ExtensionStorage = typeof defaultStorageConfig;
+
+export interface FlatDocumentSymbol extends DocumentSymbol {
+    parent: string | null;
+}

@@ -1,7 +1,8 @@
 import { memoize } from 'lodash';
 
 import { githubCodeViewSelector, githubCodeCellSelector, MODIFIERS_LIST, keyToKeyCode, keyCodeToKey } from './constants';
-import { Position, RepoType } from './types';
+import { Position, RepoType, FlatDocumentSymbol } from './types';
+import { DocumentSymbol } from 'vscode-languageserver-types';
 
 export const checkIsGitHubDotCom = (): boolean => /^https?:\/\/(www.)?github.com/.test(window.location.href);
 
@@ -223,4 +224,14 @@ export function normalizeKeys(keys, combinator: string = '+', delimiter: string 
             return keyEventToKeyCombination(keyEventObj, combinator);
         })
         .join(delimiter);
+}
+
+export function flatSymbolTree(symbolTree: DocumentSymbol[], parent: string = null): FlatDocumentSymbol[] {
+    return symbolTree.reduce((pre, cur) => {
+        if (cur.children && cur.children.length > 0) {
+            pre = [...pre, ...flatSymbolTree(cur.children, cur.name)];
+        };
+        pre.push({ ...cur, parent });
+        return pre;
+    }, []);
 }

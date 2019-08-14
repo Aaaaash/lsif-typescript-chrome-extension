@@ -18,11 +18,12 @@ import {
     getCodingCloneUrl,
     getGitHubCloneUrl,
     normalizeKeys,
+    flatSymbolTree,
 } from '../utils';
 import { logger, field } from '../logger';
 import { AgentConnection } from '../connection';
 import { InitializeArguments, InitializeResponse, InitializeFaliedResponse, DocumentSymbolArguments } from '../protocol';
-import { Disposable, RepoType, ExtensionStorage } from '../types';
+import { Disposable, RepoType, ExtensionStorage, FlatDocumentSymbol } from '../types';
 import { symbolKindNames, quotesReg } from '../constants';
 import '../style/symbol-icons.css';
 
@@ -187,12 +188,37 @@ export class CodeHost {
         }
     }
 
+    private makeSymbolSearchDomList(symbolTree: FlatDocumentSymbol[]): HTMLElement[] {
+        return symbolTree.map((symbol) => {
+            const p = document.createElement('p');
+            p.className += 'lsif-ts-ext-symbol-search-element';
+            p.innerText = symbol.name;
+            if (symbol.parent) {
+                p.innerText += symbol.parent;
+            }
+            return p;
+        });
+    }
+
     private addSymbolSearchEventListener(symbolTree: DocumentSymbol[]): Disposable {
         const symbolSearch = document.createElement('div');
-        symbolSearch.className += 'lsif-ts-ext-symbol-search-container';
+        symbolSearch.className += 'lsif-ts-ext-symbol-search-dialog';
 
+        const symbolSearchInput = document.createElement('input');
+        symbolSearch.appendChild(symbolSearchInput);
+
+        document.addEventListener('keydown', (ev: KeyboardEvent) => {
+            if (ev.keyCode === 27) {
+                symbolSearch.classList.remove('lsif-ts-ext-symbol-search-show');
+            }
+        });
+        document.body.appendChild(symbolSearch);
         Mousetrap.bind('ctrl+shift+o', (e) => {
-            console.log('Show symbol search dialog.');
+            const symbolDomList = this.makeSymbolSearchDomList(flatSymbolTree(symbolTree));
+            symbolSearch.classList.add('lsif-ts-ext-symbol-search-show');
+            for(const element of symbolDomList) {
+                symbolSearch.appendChild(element);
+            }
         });
 
         return {
