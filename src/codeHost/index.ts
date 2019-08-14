@@ -25,6 +25,7 @@ import { AgentConnection } from '../connection';
 import { InitializeArguments, InitializeResponse, InitializeFaliedResponse, DocumentSymbolArguments } from '../protocol';
 import { Disposable, RepoType, ExtensionStorage, FlatDocumentSymbol } from '../types';
 import { symbolKindNames, quotesReg } from '../constants';
+import { createSymbolIconNode, createDescriptionNode } from '../domUtils';
 import '../style/symbol-icons.css';
 
 marked.setOptions({ highlight: (code: string, lang: string) => hljs.highlight(lang, code).value });
@@ -191,10 +192,13 @@ export class CodeHost {
     private makeSymbolSearchDomList(symbolTree: FlatDocumentSymbol[]): HTMLElement[] {
         return symbolTree.map((symbol) => {
             const p = document.createElement('p');
+            const icon = createSymbolIconNode(symbol);
             p.className += 'lsif-ts-ext-symbol-search-element';
-            p.innerText = symbol.name;
+            p.appendChild(icon);
+            p.innerHTML += symbol.name;
             if (symbol.parent) {
-                p.innerText += symbol.parent;
+                const desc = createDescriptionNode(symbol.parent);
+                p.appendChild(desc);
             }
             return p;
         });
@@ -207,6 +211,11 @@ export class CodeHost {
         const symbolSearchInput = document.createElement('input');
         symbolSearch.appendChild(symbolSearchInput);
 
+        const symbolSearchList = document.createElement('div');
+        symbolSearchList.className = 'lsif-ts-ext-symbol-search-list';
+
+        symbolSearch.appendChild(symbolSearchList);
+
         document.addEventListener('keydown', (ev: KeyboardEvent) => {
             if (ev.keyCode === 27) {
                 symbolSearch.classList.remove('lsif-ts-ext-symbol-search-show');
@@ -217,7 +226,7 @@ export class CodeHost {
             const symbolDomList = this.makeSymbolSearchDomList(flatSymbolTree(symbolTree));
             symbolSearch.classList.add('lsif-ts-ext-symbol-search-show');
             for(const element of symbolDomList) {
-                symbolSearch.appendChild(element);
+                symbolSearchList.appendChild(element);
             }
         });
 
