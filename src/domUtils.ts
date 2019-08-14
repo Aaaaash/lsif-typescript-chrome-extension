@@ -2,8 +2,8 @@ import { DocumentSymbol } from 'vscode-languageserver-types';
 import { symbolKindNames } from './constants';
 
 export function createSymbolIconNode(symbol: DocumentSymbol): HTMLSpanElement {
-    const span = document.createElement('span');
-    span.className = `lsif-ts-ext-symbol-icon lsif-ts-ext-symbol-icon-${symbolKindNames[symbol.kind]}`;
+    const span = document.createElement('symbol-icon');
+    span.setAttribute('data-icon', symbolKindNames[symbol.kind]);
     return span;
 }
 

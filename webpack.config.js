@@ -2,6 +2,8 @@ const path = require('path');
 const WebpackBarPlugin = require('webpackbar');
 const { DefinePlugin } = require('webpack');
 
+const createCssToStringTransfomer = require('./transformer/cssStringTransformer');
+
 const production = process.env.NODE_ENV === 'production';
 
 if (!production) {
@@ -27,7 +29,17 @@ module.exports = {
             {
                 exclude: /node_modules/,
                 test: /\.tsx?$/,
-                use: 'ts-loader'
+                use: {
+                    loader: 'ts-loader',
+                    options: {
+                        transpileOnly: true,
+                        getCustomTransformers: (service) => ({
+                            before: [
+                                createCssToStringTransfomer(service),
+                            ]
+                        }),
+                    },
+                }
             },
             {
                 // exclude: /node_modules/,
@@ -42,11 +54,11 @@ module.exports = {
                 ]
             },
             {
-			    test: /\.svg/,
-			    use: {
-			        loader: 'svg-url-loader',
-			        options: {}
-			    }
+                test: /\.svg/,
+                use: {
+                    loader: 'svg-url-loader',
+                    options: {}
+                }
             }
         ]
     },

@@ -6,6 +6,7 @@ import { DocumentSymbol } from 'vscode-languageserver-types';
 import 'highlight.js/styles/github.css';
 import * as Mousetrap from 'mousetrap';
 
+import '../components';
 import {
     memoizedFindCodeCellFromContainer,
     checkTargetIsCodeCellOrChildnodes,
