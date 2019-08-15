@@ -58,3 +58,19 @@
     margin-left: 10px;
     display: inline-block;
 }
+
+.lsif-ts-ext-symbol-search-list::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+    padding-right: 2px;
+    background-color: #ccc;
+}
+
+.lsif-ts-ext-symbol-search-list::-webkit-scrollbar-thumb {
+    border-radius: 0px;
+    background-color: #999;
+}
+
+.lsif-ts-ext-symbol-search-list::-webkit-scrollbar-button {
+    display: none;
+}

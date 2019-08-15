@@ -24,9 +24,8 @@ import {
 import { logger, field } from '../logger';
 import { AgentConnection } from '../connection';
 import { InitializeArguments, InitializeResponse, InitializeFaliedResponse, DocumentSymbolArguments } from '../protocol';
-import { Disposable, RepoType, ExtensionStorage, FlatDocumentSymbol } from '../types';
+import { Disposable, RepoType, ExtensionStorage } from '../types';
 import { symbolKindNames, quotesReg } from '../constants';
-import { createSymbolIconNode, createDescriptionNode } from '../domUtils';
 import '../style/symbol-icons.css';
 
 marked.setOptions({ highlight: (code: string, lang: string) => hljs.highlight(lang, code).value });
@@ -190,38 +189,17 @@ export class CodeHost {
         }
     }
 
-    private makeSymbolSearchDomList(symbolTree: FlatDocumentSymbol[]): HTMLElement[] {
-        return symbolTree.map((symbol) => {
-            const p = document.createElement('p');
-            const icon = createSymbolIconNode(symbol);
-            p.className += 'lsif-ts-ext-symbol-search-element';
-            p.appendChild(icon);
-            p.innerHTML += symbol.name;
-            if (symbol.parent) {
-                const desc = createDescriptionNode(symbol.parent);
-                p.appendChild(desc);
-            }
-            p.dataset['symbolInfo'] = JSON.stringify(symbol);
-            return p;
-        });
-    }
-
-    private makeSymbolAreaHref(symbol: DocumentSymbol): string {
-        const { range: { start, end } } = symbol;
-        const { domain, owner, project,  } = this.blobDetail;
-        return `https:\/\/${domain}\/${owner}\/${project}\/blob\/${this.tagOrCommit}\/${this.relativePath}#L${start.line + 2}#L${end.line + 2}`;
-    }
-
     private addSymbolSearchEventListener(symbolTree: DocumentSymbol[]): Disposable {
         const symbolSearch = document.createElement('symbol-search-dialog');
+        symbolSearch.setAttribute('data-symboltree', JSON.stringify(flatSymbolTree(symbolTree)));
+        symbolSearch.setAttribute('data-blobdetail', JSON.stringify({
+            ...this.blobDetail,
+            tagOrCommit: this.tagOrCommit,
+            relativePath: this.relativePath,
+        }));
 
-        // const symbolSearchInput = document.createElement('input');
-        // symbolSearch.appendChild(symbolSearchInput);
-
-        // const symbolSearchList = document.createElement('div');
-        // symbolSearchList.className = 'lsif-ts-ext-symbol-search-list';
-
-        // symbolSearch.appendChild(symbolSearchList);
+        const symbolSearchList = document.createElement('div');
+        symbolSearchList.className = 'lsif-ts-ext-symbol-search-list';
 
         document.addEventListener('keydown', (ev: KeyboardEvent) => {
             if (ev.keyCode === 27) {
@@ -230,16 +208,7 @@ export class CodeHost {
         });
         document.body.appendChild(symbolSearch);
         Mousetrap.bind('ctrl+shift+o', (e) => {
-            // const symbolDomList = this.makeSymbolSearchDomList(flatSymbolTree(symbolTree));
-            // symbolSearch.classList.add('lsif-ts-ext-symbol-search-show');
             symbolSearch.setAttribute('data-show', 'true');
-            // for(const element of symbolDomList) {
-            //     element.addEventListener('click', () => {
-            //         const symbolInfo: DocumentSymbol = JSON.parse(element.dataset['symbolInfo']);
-            //         window.location.href = this.makeSymbolAreaHref(symbolInfo);
-            //     });
-            //     symbolSearchList.appendChild(element);
-            // }
         });
 
         return {
