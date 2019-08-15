@@ -77,7 +77,7 @@ const services = ts.createLanguageService(
 
 
 let result = ts.transpileModule(source, {
-    compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ESNext },
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ESNext },
     transformers: { before: [createCssStringTransformer(services)] },
     fileName: '/Users/baoxubing/Documents/work/lsif-project/lsif-typescript-chrome-extensions/src/components/symbolIcon.ts'
 });

@@ -1,8 +1,11 @@
 const ts = require('typescript');
 const path = require('path');
 const fs = require('fs');
+const valueParser = require('postcss-value-parser');
+const base64JS = require('base64-js');
 
-const quotesReg = /^\'|"|\'|"$/g;
+const quotesRegexp = /^\'|"|\'|"$/g;
+const dataUrlRegexp = /^data:([a-z]+\/[a-z0-9-+.]+(;[a-z0-9-.!#$%*+.{}|~`]+=[a-z0-9-.!#$%*+.{}|~`]+)*)?(;base64)?,([a-z0-9!$&',()*+;=\-._~:@\/?%\s]*?)$/i;
 
 function isImportNode(node) {
     return (
@@ -11,7 +14,7 @@ function isImportNode(node) {
 }
 
 function isCssStringImportCall(node) {
-    return node.moduleSpecifier.getText().replace(quotesReg, '').startsWith('cssToString');
+    return node.moduleSpecifier.getText().replace(quotesRegexp, '').startsWith('cssToString');
 }
 
 function nullCssString(named) {
@@ -23,8 +26,12 @@ function nullCssString(named) {
     );
 }
 
+function transformCssBgImageToDataUrl(textBuffer) {
+    return base64JS.fromByteArray(textBuffer);
+}
+
 function replaceImportDeclarationToCssString(node) {
-    const relativePath = node.moduleSpecifier.getText().replace(quotesReg, '').split('!!').pop();
+    const relativePath = node.moduleSpecifier.getText().replace(quotesRegexp, '').split('!!').pop();
     const sourceFileName = node.getSourceFile().fileName;
     const sourceFileDir = path.dirname(sourceFileName);
     const absolutePath = path.resolve(sourceFileDir, relativePath);
@@ -34,10 +41,33 @@ function replaceImportDeclarationToCssString(node) {
         return nullCssString(node.importClause);
     }
 
-    const textContent = fs.readFileSync(absolutePath).toString();
+    const sourceCssContent = fs.readFileSync(absolutePath).toString();
+    const parsed = valueParser(sourceCssContent);
+
+    parsed.walk((node) => {
+        if(node.type !== 'function' && node.value !== 'url') {
+            return;
+        }
+
+        node.nodes = node.nodes.map((childNode) => {
+            if (childNode.type === 'string' && dataUrlRegexp.test(childNode.value)) {
+                return childNode;
+            }
+
+            const cssFileDir = path.dirname(absolutePath);
+            const bgImagePath = path.resolve(cssFileDir, childNode.value);
+            const transformed = transformCssBgImageToDataUrl(fs.readFileSync(bgImagePath));
+
+            return {
+                ...childNode,
+                value: `data:image/svg+xml;base64,${transformed}`,
+            };
+        });
+    });
+
     return ts.createVariableDeclarationList(
         [
-            ts.createVariableDeclaration(node.importClause, undefined, ts.createStringLiteral(textContent))
+            ts.createVariableDeclaration(node.importClause, undefined, ts.createStringLiteral(parsed.toString()))
         ],
         ts.NodeFlags.Const,
     );
