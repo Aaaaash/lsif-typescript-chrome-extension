@@ -306,7 +306,7 @@ export class CodeHost {
             data-expanded="false"
         ></span>` :
         '<span class="lsif-ts-ext-symbol-icon"></span>'}
-                <span class="lsif-ts-ext-symbol-icon lsif-ts-ext-symbol-icon-${symbolKindNames[symbolItem.kind]}"></span>
+                <symbol-icon style="height:14px;" data-icon="${symbolKindNames[symbolItem.kind]}"></symbol-icon>
                 <span class="lsif-ts-ext-symbol-link">${symbolItem.name}</span>
             </li>
             ${symbolItem.children ?

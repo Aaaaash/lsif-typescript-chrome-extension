@@ -1,3 +1,4 @@
+// @ts-ignore
 import cssString from 'cssToString!!../style/symbol-icons.css';
 
 class SymbolIcon extends HTMLElement {
