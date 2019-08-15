@@ -45,7 +45,7 @@ function replaceImportDeclarationToCssString(node) {
     const parsed = valueParser(sourceCssContent);
 
     parsed.walk((node) => {
-        if(node.type !== 'function' && node.value !== 'url') {
+        if(node.type !== 'function' || node.value !== 'url') {
             return;
         }
 

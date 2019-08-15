@@ -213,33 +213,33 @@ export class CodeHost {
     }
 
     private addSymbolSearchEventListener(symbolTree: DocumentSymbol[]): Disposable {
-        const symbolSearch = document.createElement('div');
-        symbolSearch.className += 'lsif-ts-ext-symbol-search-dialog';
+        const symbolSearch = document.createElement('symbol-search-dialog');
 
-        const symbolSearchInput = document.createElement('input');
-        symbolSearch.appendChild(symbolSearchInput);
+        // const symbolSearchInput = document.createElement('input');
+        // symbolSearch.appendChild(symbolSearchInput);
 
-        const symbolSearchList = document.createElement('div');
-        symbolSearchList.className = 'lsif-ts-ext-symbol-search-list';
+        // const symbolSearchList = document.createElement('div');
+        // symbolSearchList.className = 'lsif-ts-ext-symbol-search-list';
 
-        symbolSearch.appendChild(symbolSearchList);
+        // symbolSearch.appendChild(symbolSearchList);
 
         document.addEventListener('keydown', (ev: KeyboardEvent) => {
             if (ev.keyCode === 27) {
-                symbolSearch.classList.remove('lsif-ts-ext-symbol-search-show');
+                symbolSearch.setAttribute('data-show', 'false');
             }
         });
         document.body.appendChild(symbolSearch);
         Mousetrap.bind('ctrl+shift+o', (e) => {
-            const symbolDomList = this.makeSymbolSearchDomList(flatSymbolTree(symbolTree));
-            symbolSearch.classList.add('lsif-ts-ext-symbol-search-show');
-            for(const element of symbolDomList) {
-                element.addEventListener('click', () => {
-                    const symbolInfo: DocumentSymbol = JSON.parse(element.dataset['symbolInfo']);
-                    window.location.href = this.makeSymbolAreaHref(symbolInfo);
-                });
-                symbolSearchList.appendChild(element);
-            }
+            // const symbolDomList = this.makeSymbolSearchDomList(flatSymbolTree(symbolTree));
+            // symbolSearch.classList.add('lsif-ts-ext-symbol-search-show');
+            symbolSearch.setAttribute('data-show', 'true');
+            // for(const element of symbolDomList) {
+            //     element.addEventListener('click', () => {
+            //         const symbolInfo: DocumentSymbol = JSON.parse(element.dataset['symbolInfo']);
+            //         window.location.href = this.makeSymbolAreaHref(symbolInfo);
+            //     });
+            //     symbolSearchList.appendChild(element);
+            // }
         });
 
         return {

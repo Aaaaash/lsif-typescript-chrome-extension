@@ -12,7 +12,7 @@ class SymbolIcon extends HTMLElement {
 
         this.spanElement = document.createElement('span');
         this.spanElement.className = 'lsif-ts-ext-symbol-icon';
-        
+
         shadowRoot.appendChild(this.spanElement);
         shadowRoot.appendChild(style);
     }
@@ -21,7 +21,7 @@ class SymbolIcon extends HTMLElement {
         this.spanElement.classList.add(`lsif-ts-ext-symbol-icon-${iconType}`);
     }
 
-    connectedCallback(): void {}
+    connectedCallback(): void { }
 
     attributeChangedCallback(name: string, oldValue: string | null, newValue: string): void {
         if (name === 'data-icon' && oldValue !== newValue) {
@@ -32,6 +32,6 @@ class SymbolIcon extends HTMLElement {
     static get observedAttributes(): string[] { return ['data-icon']; }
 }
 
-const customElementName = 'symbol-icon';
+export const symbolIcon = 'symbol-icon';
 
-window.customElements.define(customElementName, SymbolIcon);
+window.customElements.define(symbolIcon, SymbolIcon);

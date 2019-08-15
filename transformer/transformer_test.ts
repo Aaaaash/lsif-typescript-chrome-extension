@@ -4,7 +4,7 @@ import * as fs from 'fs';
 const createCssStringTransformer = require('./cssStringTransformer');
 
 const source = `
-import cssString from 'cssToString!!../style/symbol-icons.css';
+import cssString from 'cssToString!!./symbol-search-dialog.css';
 
 class SymbolIcon extends HTMLElement {
     private spanElement: HTMLSpanElement;
