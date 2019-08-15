@@ -1,2 +1,2 @@
 import './symbolIcon';
-import './symbokSearchDialog';
+import './symbolSearchDialog';
