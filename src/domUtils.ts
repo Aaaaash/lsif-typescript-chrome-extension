@@ -13,3 +13,8 @@ export function createDescriptionNode(text: string): HTMLSpanElement {
     span.innerText = text;
     return span;
 }
+
+export function preventDefaultStopPropagation(e): void {
+    e.stopPropagation();
+    e.preventDefault();
+}

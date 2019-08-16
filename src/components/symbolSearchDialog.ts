@@ -1,12 +1,14 @@
 // @ts-ignore
 import cssString from 'cssToString!!./symbol-search-dialog.css';
-import { createSymbolIconNode, createDescriptionNode } from '../domUtils';
+import { createSymbolIconNode, createDescriptionNode, preventDefaultStopPropagation } from '../domUtils';
 import { DocumentSymbol } from 'vscode-languageserver-types';
 
 class SymbolSearchDialog extends HTMLElement {
     private container: HTMLElement;
 
     private symbolList: HTMLElement;
+
+    private searchInput: HTMLInputElement;
 
     constructor() {
         super();
@@ -21,16 +23,19 @@ class SymbolSearchDialog extends HTMLElement {
         this.symbolList = document.createElement('div');
         this.symbolList.className = 'lsif-ts-ext-symbol-search-list';
 
-        const input = document.createElement('input');
+        this.searchInput = document.createElement('input');
 
         shadowRoot.appendChild(style);
         shadowRoot.appendChild(this.container);
-        this.container.appendChild(input);
+        this.container.appendChild(this.searchInput);
         this.container.appendChild(this.symbolList);
+
+        this.searchInput.addEventListener('keydown', (e) => {
+            e.stopPropagation();
+        });
     }
 
     static get observedAttributes(): string[] { return ['data-show']; }
-
 
     private makeSymbolAreaHref(symbol: DocumentSymbol): string {
         const { range: { start, end } } = symbol;
@@ -39,6 +44,7 @@ class SymbolSearchDialog extends HTMLElement {
     }
 
     private renderSymbolList(): void {
+        this.symbolList.innerHTML = '';
         const symbolTree = JSON.parse(this.dataset['symboltree']);
         const symbolDomList = symbolTree.map((symbol) => {
             const p = document.createElement('p');
@@ -75,6 +81,7 @@ class SymbolSearchDialog extends HTMLElement {
                 if (newValue === 'true') {
                     this.container.classList.add('lsif-ts-ext-symbol-search-show');
                     this.renderSymbolList();
+                    this.searchInput.focus();
                 } else if (newValue === 'false') {
                     this.container.classList.remove('lsif-ts-ext-symbol-search-show');
                 }
