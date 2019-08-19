@@ -31,6 +31,9 @@ class SymbolSearchDialog extends HTMLElement {
         this.container.appendChild(this.symbolList);
 
         this.searchInput.addEventListener('keydown', (e) => {
+            if (e.keyCode === 27) {
+                this.setAttribute('data-show', 'false');
+            }
             e.stopPropagation();
         });
     }
