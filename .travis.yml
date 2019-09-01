@@ -12,6 +12,7 @@ node_js:
 install:
   - yarn install
   - sudo apt-get install unzip
+  - yarn audit fix
 
 script:
   - yarn run lint
