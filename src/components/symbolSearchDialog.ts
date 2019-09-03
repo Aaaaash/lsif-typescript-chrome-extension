@@ -35,8 +35,7 @@ class SymbolSearchDialog extends HTMLElement {
                 this.setAttribute('data-show', 'false');
                 return false;
             }
-            e.stopPropagation();
-            e.preventDefault();
+            preventDefaultStopPropagation(e);
         });
     }
 
