@@ -46,7 +46,7 @@
     "highlight.js": "^9.15.8",
     "lodash": "^4.17.14",
     "lsif-protocol": "^0.4.3",
-    "marked": "^0.7.0",
+    "marked": "^4.0.10",
     "mousetrap": "^1.6.3",
     "postcss-value-parser": "^4.0.2",
     "react": "^16.8.6",
